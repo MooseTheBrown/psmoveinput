@@ -23,7 +23,7 @@ Pre-requisites
 
 Getting the sources
 -------------------------------------------------------------------------------
-git clone !!!<put_the_link_here>!!!
+git clone https://github.com/MooseTheBrown/psmoveinput.gi
 
 Building the source
 -------------------------------------------------------------------------------
