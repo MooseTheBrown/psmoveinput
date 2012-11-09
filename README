@@ -1,0 +1,63 @@
+psmoveinput 0.1.0
+
+Description
+-------------------------------------------------------------------------------
+psmoveinput is a userspace Linux input driver that uses data from PSMove motion
+controller to inject events to kernel's input subsystem thus making it possible
+to use PSMove as a combined mouse/keyboard input device. It gives users ability
+to control mouse pointer movements by moving PSMove controller and map PSMove
+keys to common keyboard keys.
+
+Dependencies
+-------------------------------------------------------------------------------
+psmoveinput requires the following software to be installed:
+
+- psmoveapi (http://thp.io/2010/psmove/)
+- uinput module (modprobe uinput as root)
+- bluez
+- boost-thread
+- boost-program-options
+
+bluez and boost libraries should be present in most distributions' repos.
+psmoveapi should be compiled and installed from source.
+
+Installation
+-------------------------------------------------------------------------------
+See INSTALL for instructions on how to build and install psmoveinput.
+
+Configuring and running
+-------------------------------------------------------------------------------
+psmoveinput needs to be run by root user in order to interact with uinput module.
+psmoveinput recognizes several command-line options and reads its configuration
+from a file. The location of configuration file is specified with -c or --config
+command line options. During psmoveinput installation default configuration
+file is installed to /etc/psmoveinput.conf. This file contains description of
+all configurable options.
+To get the list of all recognized command line options run psmoveinput with
+-h or --help argument.
+
+Connecting PSMove controller
+-------------------------------------------------------------------------------
+1. Connect PSMove to PC via USB.
+2. Run "psmovepair" as root. Notice controller's Bluetooth address. psmovepair
+   is part of psmoveapi (see INSTALL for details).
+3. Disconnect the controller.
+4. Run "bluez-register-psmove <controller_BT_addr>" as root. bluez-register-psmove
+   is part of psmoveapi (see INSTALL for details).
+5. Restart bluetoothd.
+6. Press the PS button on the PSMove controller. You may see popup indicating
+   Bluetooth connection attempt from the controller (depends on desktop environment
+    used). Authorize it and wait until the PSMove is connected.
+7. Run "psmoveinput" as root. It will automatically connect to the controller and
+   start injecting input events.
+
+Currently psmoveinput supports only one controller and does not automatically
+detect when it is disconnected. After disconnecting Bluetooth link between
+PSMove and PC it is necessary to kill psmoveinput, restart it and repeat step
+6 from the sequence above.
+
+License
+-------------------------------------------------------------------------------
+GNU GPLv3 or any later version (see COPYING).
+Google Test Framework provided with psmoveinput is covered by its own license,
+see gtest-1.6.0/COPYING for details.
