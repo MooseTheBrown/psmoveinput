@@ -23,7 +23,7 @@
 #ifndef PSMOVEINPUT_TEST_CONFIG_H
 #define PSMOVEINPUT_TEST_CONFIG_H
 
-#define TEST_CONFIG_PATH "/home/romendakil/devel/psmoveinput/test/test_configs/"
-#define FIND_DEVICE_SCRIPT "/home/romendakil/devel/psmoveinput/test/find_input.sh"
+#define TEST_CONFIG_PATH "/home/msapozhnikov/devel/psmoveinput/test/test_configs/"
+#define FIND_DEVICE_SCRIPT "/home/msapozhnikov/devel/psmoveinput/test/find_input.sh"
 
 #endif // PSMOVEINPUT_TEST_CONFIG_H

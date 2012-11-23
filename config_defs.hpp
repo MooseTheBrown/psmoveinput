@@ -42,6 +42,9 @@ namespace psmoveinput
 #define OPT_VERSION "version,v"
 #define OPT_VERSION_DESC "print version information"
 #define OPT_VERSION_ONLYLONG "version"
+#define OPT_MODE "mode,m"
+#define OPT_MODE_DESC "operation mode"
+#define OPT_MODE_ONLYLONG "mode"
 // config file options
 #define OPT_CONF_PID "PID_FILE"
 #define OPT_CONF_LOG "LOG_LEVEL"
@@ -66,6 +69,11 @@ namespace psmoveinput
 #define OPT_PSBTN_PS "PSBTN_PS"
 #define OPT_PSBTN_MOVE "PSBTN_MOVE"
 #define OPT_PSBTN_T "PSBTN_T"
+#define OPT_CONF_MODE "MODE"
+
+// operation modes
+#define OPT_MODE_STANDALONE "standalone"
+#define OPT_MODE_CLIENT     "client"
 
 // defaults
 #define DEF_PIDFILE "/var/run/psmoveinput.pid"
@@ -73,6 +81,7 @@ namespace psmoveinput
 #define DEF_CONFIGFILE "/etc/psmoveinput.conf"
 #define DEF_MOVEC_X 1.0
 #define DEF_MOVEC_Y 1.0
+#define DEF_MODE    OPT_MODE_STANDALONE
 
 } // namespace psmoveinput
 

@@ -51,6 +51,8 @@ public:
     key_map getKeyMap() { return keymap_; }
     // get log level
     LogLevel getLogLevel() { return loglevel_; }
+    // get operation mode
+    OpMode getOpMode() { return opmode_; }
 
     // parsing status
     bool isOK() { return ok_; }
@@ -79,11 +81,14 @@ protected:
     bool config_file_set_;
     key_map keymap_;
     KeyMapParser keymap_parser_;
+    OpMode opmode_;
+    bool opmode_set_;
     
     void handleCmdLine();
     void getLogFromChar(char l);
     void parseConfig();
     bool configFileOK();
+    void getModeFromString(const std::string &mode);
 };
 
 } // namespace psmoveinput

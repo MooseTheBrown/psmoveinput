@@ -41,7 +41,9 @@ Config::Config() :
     loglevel_(DEF_LOGLEVEL),
     pidfile_(DEF_PIDFILE),
     config_file_(DEF_CONFIGFILE),
-    config_file_set_(false)
+    config_file_set_(false),
+    opmode_(OpMode::STANDALONE),
+    opmode_set_(false)
 {
     // command line options description
     optdesc_.add_options()
@@ -49,7 +51,8 @@ Config::Config() :
         (OPT_VERSION, OPT_VERSION_DESC)
         (OPT_PID, po::value<std::string>(), OPT_PID_DESC)
         (OPT_LOG, po::value<char>(), OPT_LOG_DESC)
-        (OPT_CONFIG, po::value<std::string>(), OPT_CONFIG_DESC);
+        (OPT_CONFIG, po::value<std::string>(), OPT_CONFIG_DESC)
+        (OPT_MODE, po::value<std::string>(), OPT_MODE_DESC);
 
     // config file options description
     configdesc_.add_options()
@@ -75,7 +78,8 @@ Config::Config() :
         (OPT_PSBTN_LEFT, po::value<std::string>())
         (OPT_PSBTN_PS, po::value<std::string>())
         (OPT_PSBTN_MOVE, po::value<std::string>())
-        (OPT_PSBTN_T, po::value<std::string>());
+        (OPT_PSBTN_T, po::value<std::string>())
+        (OPT_CONF_MODE, po::value<std::string>());
 }
 
 Config::~Config()
@@ -138,6 +142,10 @@ void Config::handleCmdLine()
                 config_file_ = opts_[OPT_CONFIG_ONLYLONG].as<std::string>();
                 config_file_set_ = true;
             }
+            if (opts_.count(OPT_MODE_ONLYLONG))
+            {
+                getModeFromString(opts_[OPT_MODE_ONLYLONG].as<std::string>());
+            }
             ok_ = true;
         }
         catch(std::exception &e)
@@ -199,6 +207,10 @@ void Config::parseConfig()
         {
             coeffs_.cy = conf_opts_[OPT_MOVEC_Y].as<double>();
         }
+        if (conf_opts_.count(OPT_CONF_MODE) && !opmode_set_)
+        {
+            getModeFromString(conf_opts_[OPT_CONF_MODE].as<std::string>());
+        }
 
         // add key map entries one by one
         const std::vector<boost::shared_ptr<po::option_description>> &opts = configdesc_.options();
@@ -209,6 +221,7 @@ void Config::parseConfig()
                  (longname != OPT_CONF_LOG) &&
                  (longname != OPT_MOVEC_X) &&
                  (longname != OPT_MOVEC_Y) &&
+                 (longname != OPT_CONF_MODE) &&
                  conf_opts_.count(longname) )
             {
                 KeyMapEntry entry;
@@ -261,6 +274,20 @@ bool Config::configFileOK()
     }
 
     return ok;
+}
+
+void Config::getModeFromString(const std::string &mode)
+{
+    if (mode == OPT_MODE_STANDALONE)
+    {
+        opmode_ = OpMode::STANDALONE;
+        opmode_set_ = true;
+    }
+    else if (mode == OPT_MODE_CLIENT)
+    {
+        opmode_ = OpMode::CLIENT;
+        opmode_set_ = true;
+    }
 }
 
 } // namespace psmoveinput

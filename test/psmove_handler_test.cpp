@@ -130,7 +130,7 @@ TEST_F(PSMoveHandlerTest, CorrectButtons)
 TEST_F(PSMoveHandlerTest, IncorrectButtons)
 {
     // report keys, which are not present in the handler's key map
-    handler_->onButtons(Btn_DOWN);
+    handler_->onButtons(Btn_SELECT);
     ASSERT_EQ(0, listener_.code_);
     ASSERT_EQ(false, listener_.pressed_);
 }

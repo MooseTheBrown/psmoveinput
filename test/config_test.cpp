@@ -31,7 +31,7 @@ namespace psmoveconfig_test
 
 TEST(ConfigTest, CommandLine)
 {
-    const char *argv[7];
+    const char *argv[9];
     psmoveinput::Config config;
     
     // program name
@@ -45,17 +45,21 @@ TEST(ConfigTest, CommandLine)
     // config file
     argv[5] = "-c";
     argv[6] = "/nonexistent";
+    // operation mode
+    argv[7] = "-m";
+    argv[8] = "client";
 
-    config.parse(7, const_cast<char**>(argv));
+    config.parse(9, const_cast<char**>(argv));
     ASSERT_EQ(true, config.isOK());
     ASSERT_STREQ("/var/run/testpidfile", config.getPidFileName());
     ASSERT_STREQ("/nonexistent", config.getConfigFileName());
     ASSERT_EQ(psmoveinput::LogLevel::INFO, config.getLogLevel());
+    ASSERT_EQ(psmoveinput::OpMode::CLIENT, config.getOpMode());
 
     // mess up command line a bit
     psmoveinput::Config invalid_config;
     argv[4] = "blah";
-    invalid_config.parse(7, const_cast<char**>(argv));
+    invalid_config.parse(9, const_cast<char**>(argv));
     ASSERT_EQ(false, invalid_config.isOK());
 
     // mess up command line totally
@@ -67,7 +71,7 @@ TEST(ConfigTest, CommandLine)
 
 TEST(ConfigTest, LongOptions)
 {
-    const char *argv[7];
+    const char *argv[9];
     psmoveinput::Config config;
 
     // program name
@@ -81,12 +85,16 @@ TEST(ConfigTest, LongOptions)
     // config file
     argv[5] = "--config";
     argv[6] = "/nonexistent";
+    // operation mode
+    argv[7] = "--mode";
+    argv[8] = "client";
 
-    config.parse(7, const_cast<char**>(argv));
+    config.parse(9, const_cast<char**>(argv));
     ASSERT_EQ(true, config.isOK());
     ASSERT_STREQ("/var/run/testpidfile", config.getPidFileName());
     ASSERT_STREQ("/nonexistent", config.getConfigFileName());
     ASSERT_EQ(psmoveinput::LogLevel::INFO, config.getLogLevel());
+    ASSERT_EQ(psmoveinput::OpMode::CLIENT, config.getOpMode());
 }
 
 TEST(ConfigTest, CorrectConfig)
@@ -112,6 +120,9 @@ TEST(ConfigTest, CorrectConfig)
     psmoveinput::MoveCoeffs coeffs = config.getMoveCoeffs();
     ASSERT_EQ(1.0, coeffs.cx);
     ASSERT_EQ(1.5, coeffs.cy);
+
+    // check operation mode
+    ASSERT_EQ(psmoveinput::OpMode::CLIENT, config.getOpMode());
 
     // check key map
     psmoveinput::key_map keymap = config.getKeyMap();

@@ -55,6 +55,13 @@ struct MoveCoeffs
     double cy;
 };
 
+// psmoveinput operation mode
+enum class OpMode : unsigned char
+{
+    STANDALONE = 0,
+    CLIENT
+};
+
 } // namespace psmoveinput
 
 #endif // PSMOVEINPUT_COMMON_HPP
