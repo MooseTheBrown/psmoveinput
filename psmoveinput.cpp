@@ -323,7 +323,7 @@ void PSMoveInput::initHandler()
 
 void PSMoveInput::startListener()
 {
-    listener_ = new PSMoveListener(*log_);
+    listener_ = new PSMoveListener(*log_, config_.getOpMode());
 
     // connect listener signals to handler slots
     gyro_signal &gyroSignal = listener_->getGyroSignal();

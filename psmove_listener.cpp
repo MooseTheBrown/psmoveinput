@@ -28,6 +28,7 @@ namespace psmoveinput
 {
 
 PSMoveListener::PSMoveListener(Log &log,
+                               OpMode mode,
                                int pollTimeout,
                                int connectTimeout) :
     move_(nullptr),
@@ -35,7 +36,8 @@ PSMoveListener::PSMoveListener(Log &log,
     pollTimeout_(pollTimeout),
     connectTimeout_(connectTimeout),
     stop_(false),
-    buttons_(0)
+    buttons_(0),
+    mode_(mode)
 {
 }
 

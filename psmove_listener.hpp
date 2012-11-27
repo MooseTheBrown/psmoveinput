@@ -42,6 +42,7 @@ public:
 #define DEFAULT_CONN_TIMEOUT    10000
 
     PSMoveListener(Log &log,
+                   OpMode mode,
                    int pollTimeout = DEFAULT_POLL_TIMEOUT,
                    int connectTimeout = DEFAULT_CONN_TIMEOUT);
     virtual ~PSMoveListener();
@@ -60,6 +61,7 @@ protected:
     int connectTimeout_;
     bool stop_;
     int buttons_;
+    OpMode mode_;
 
     void connect();
 };
