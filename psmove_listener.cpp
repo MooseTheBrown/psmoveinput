@@ -23,6 +23,7 @@
 #include "psmove_listener.hpp"
 #include <boost/thread.hpp>
 #include <boost/format.hpp>
+#include <cstdlib>
 
 namespace psmoveinput
 {
@@ -54,6 +55,8 @@ PSMoveListener::~PSMoveListener()
 
 void PSMoveListener::run()
 {
+    init();
+
     connect();
 
     // if stopped, don't enter the polling loop
@@ -113,4 +116,38 @@ void PSMoveListener::connect()
     }
 }
 
+void PSMoveListener::init()
+{
+    // in moved client mode we need to check if moved is running,
+    // and if it is, then make psmoveapi ignore all hidapi controllers
+    if (mode_ == OpMode::CLIENT)
+    {
+        if (checkMoved() == true)
+        {
+            psmove_set_remote_config(PSMove_OnlyRemote);
+        }
+        else
+        {
+            // there is no moved, force standalone mode
+            mode_ = OpMode::STANDALONE;
+            psmove_set_remote_config(PSMove_OnlyLocal);
+            log_.write("Launched in client mode, but couldn't find moved", LogLevel::ERROR);
+            log_.write("Forcing standalone mode", LogLevel::ERROR);
+        }
+    }
 }
+
+// very ugly way to check if moved is running
+bool PSMoveListener::checkMoved()
+{
+    if (system("ps -e | grep moved") == 0)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+} // namespace psmoveinput

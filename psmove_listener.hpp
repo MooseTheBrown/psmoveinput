@@ -64,6 +64,8 @@ protected:
     OpMode mode_;
 
     void connect();
+    void init();
+    bool checkMoved();
 };
 
 } // namespace psmoveinput
