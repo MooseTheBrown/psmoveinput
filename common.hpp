@@ -47,7 +47,7 @@ struct KeyMapEntry
 
 typedef std::vector<KeyMapEntry> key_map;
 
-// accelerometer values reported by psmoveapi are multiplied by
+// gyroscope values reported by psmoveapi are multiplied by
 // these coefficients to produce move values reported to Linux input
 struct MoveCoeffs
 {
@@ -61,6 +61,14 @@ enum class OpMode : unsigned char
     STANDALONE = 0,
     CLIENT
 };
+
+enum class ControllerId : unsigned char
+{
+    FIRST,
+    SECOND
+};
+
+#define MAX_CONTROLLERS 2
 
 } // namespace psmoveinput
 

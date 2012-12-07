@@ -60,25 +60,24 @@ Config::Config() :
         (OPT_CONF_LOG, po::value<char>())
         (OPT_MOVEC_X, po::value<double>())
         (OPT_MOVEC_Y, po::value<double>())
-        (OPT_PSBTN_L2, po::value<std::string>())
-        (OPT_PSBTN_R2, po::value<std::string>())
-        (OPT_PSBTN_L1, po::value<std::string>())
-        (OPT_PSBTN_L2, po::value<std::string>())
         (OPT_PSBTN_TRIANGLE, po::value<std::string>())
         (OPT_PSBTN_CIRCLE, po::value<std::string>())
         (OPT_PSBTN_CROSS, po::value<std::string>())
         (OPT_PSBTN_SQUARE, po::value<std::string>())
         (OPT_PSBTN_SELECT, po::value<std::string>())
-        (OPT_PSBTN_L3, po::value<std::string>())
-        (OPT_PSBTN_R3, po::value<std::string>())
         (OPT_PSBTN_START, po::value<std::string>())
-        (OPT_PSBTN_UP, po::value<std::string>())
-        (OPT_PSBTN_RIGHT, po::value<std::string>())
-        (OPT_PSBTN_DOWN, po::value<std::string>())
-        (OPT_PSBTN_LEFT, po::value<std::string>())
         (OPT_PSBTN_PS, po::value<std::string>())
         (OPT_PSBTN_MOVE, po::value<std::string>())
         (OPT_PSBTN_T, po::value<std::string>())
+        (OPT_PSBTN_1_TRIANGLE, po::value<std::string>())
+        (OPT_PSBTN_1_CIRCLE, po::value<std::string>())
+        (OPT_PSBTN_1_CROSS, po::value<std::string>())
+        (OPT_PSBTN_1_SQUARE, po::value<std::string>())
+        (OPT_PSBTN_1_SELECT, po::value<std::string>())
+        (OPT_PSBTN_1_START, po::value<std::string>())
+        (OPT_PSBTN_1_PS, po::value<std::string>())
+        (OPT_PSBTN_1_MOVE, po::value<std::string>())
+        (OPT_PSBTN_1_T, po::value<std::string>())
         (OPT_CONF_MODE, po::value<std::string>());
 }
 
@@ -106,6 +105,18 @@ void Config::parse(int argc, char **argv)
     if (ok_)
     {
         parseConfig();
+    }
+}
+
+key_map Config::getKeyMap(ControllerId controller)
+{
+    if (controller == ControllerId::FIRST)
+    {
+        return keymaps_[0];
+    }
+    else
+    {
+        return keymaps_[1];
     }
 }
 
@@ -228,7 +239,24 @@ void Config::parseConfig()
                 entry = keymap_parser_.createEntry(longname, conf_opts_[longname].as<std::string>());
                 if ((entry.pscode != 0) && (entry.lincode != KEY_RESERVED))
                 {
-                    keymap_.push_back(entry);
+                    if ((longname == OPT_PSBTN_TRIANGLE) ||
+                        (longname == OPT_PSBTN_CIRCLE) ||
+                        (longname == OPT_PSBTN_CROSS) ||
+                        (longname == OPT_PSBTN_SQUARE) ||
+                        (longname == OPT_PSBTN_SELECT) ||
+                        (longname == OPT_PSBTN_START) ||
+                        (longname == OPT_PSBTN_PS) ||
+                        (longname == OPT_PSBTN_MOVE) ||
+                        (longname == OPT_PSBTN_T))
+                    {
+                        // first controller
+                        keymaps_[0].push_back(entry);
+                    }
+                    else
+                    {
+                        // second controller
+                        keymaps_[1].push_back(entry);
+                    }
                 }
                 else
                 {

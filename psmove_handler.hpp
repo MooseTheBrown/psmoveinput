@@ -40,14 +40,15 @@ typedef boost::signals2::signal<void (int, bool)> key_signal;
 class PSMoveHandler
 {
 public:
-    PSMoveHandler(const key_map &keymap,
+    PSMoveHandler(const key_map &keymap1,
+                  const key_map &keymap2,
                   const MoveCoeffs &coeffs,
                   int moveThreshold,
                   Log &log);
     virtual ~PSMoveHandler();
 
     void onGyroscope(int gx, int gy);
-    void onButtons(int buttons);
+    void onButtons(int buttons, ControllerId controller);
 
     move_signal &getMoveSignal() { return move_signal_; }
     key_signal &getKeySignal() { return key_signal_; }
@@ -55,15 +56,14 @@ public:
 protected:
     move_signal move_signal_;
     key_signal key_signal_;
-    key_map keymap_;
+    key_map keymaps_[MAX_CONTROLLERS];
     MoveCoeffs coeffs_;
     int buttons_;
     Log &log_;
     int moveThreshold_;
     timespec lastGyroTp_;
 
-    //int getIndex(int button);
-    void reportKey(int button, bool pressed);
+    void reportKey(int button, bool pressed, ControllerId controller);
 };
 
 } // namespace psmoveinput

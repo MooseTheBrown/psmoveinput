@@ -295,7 +295,12 @@ void PSMoveInput::initDevice()
     log_->write("Initializing input device");
     log_->write("Reported keys:");
 
-    for (KeyMapEntry entry : config_.getKeyMap())
+    for (KeyMapEntry entry : config_.getKeyMap(ControllerId::FIRST))
+    {
+        deviceKeys.push_back(entry.lincode);
+        log_->write(boost::str(boost::format("pscode=%1%, lincode=%2%") % entry.pscode % entry.lincode).c_str());
+    }
+    for (KeyMapEntry entry : config_.getKeyMap(ControllerId::SECOND))
     {
         deviceKeys.push_back(entry.lincode);
         log_->write(boost::str(boost::format("pscode=%1%, lincode=%2%") % entry.pscode % entry.lincode).c_str());
@@ -308,7 +313,8 @@ void PSMoveInput::initHandler()
 {
     log_->write("Initializing PSMoveHandler");
 
-    handler_ = new PSMoveHandler(config_.getKeyMap(),
+    handler_ = new PSMoveHandler(config_.getKeyMap(ControllerId::FIRST),
+                                 config_.getKeyMap(ControllerId::SECOND),
                                  config_.getMoveCoeffs(),
                                  2,   // TODO: make configurable
                                  *log_);
@@ -330,7 +336,7 @@ void PSMoveInput::startListener()
     button_signal &buttonSignal = listener_->getButtonSignal();
 
     gyroSignal.connect(boost::bind(&PSMoveHandler::onGyroscope, handler_, _1, _2));
-    buttonSignal.connect(boost::bind(&PSMoveHandler::onButtons, handler_, _1));
+    buttonSignal.connect(boost::bind(&PSMoveHandler::onButtons, handler_, _1, _2));
 
     listener_->run();
 }

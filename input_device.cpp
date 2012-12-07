@@ -119,7 +119,7 @@ void InputDevice::reportKey(int code, bool pressed)
 
     reportSyn();
 
-   log_.write(boost::str(boost::format("InputDevice::reportKey(%1%, %2%)") % code % pressed).c_str());
+    log_.write(boost::str(boost::format("InputDevice::reportKey(%1%, %2%)") % code % pressed).c_str());
 }
 
 void InputDevice::reportSyn()

@@ -48,7 +48,7 @@ public:
     // get move coeffs
     MoveCoeffs getMoveCoeffs() { return coeffs_; }
     // get keymap
-    key_map getKeyMap() { return keymap_; }
+    key_map getKeyMap(ControllerId controller);
     // get log level
     LogLevel getLogLevel() { return loglevel_; }
     // get operation mode
@@ -79,7 +79,7 @@ protected:
     MoveCoeffs coeffs_;
     std::string config_file_;
     bool config_file_set_;
-    key_map keymap_;
+    key_map keymaps_[MAX_CONTROLLERS];
     KeyMapParser keymap_parser_;
     OpMode opmode_;
     bool opmode_set_;

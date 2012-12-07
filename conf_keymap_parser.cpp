@@ -30,25 +30,24 @@ namespace psmoveinput
 
 KeyMapParser::KeyMapParser() :
     psmap_ {
-//        std::make_pair(OPT_PSBTN_L2, Btn_L2),
-//        std::make_pair(OPT_PSBTN_R2, Btn_R2),
-//        std::make_pair(OPT_PSBTN_L1, Btn_L1),
-//        std::make_pair(OPT_PSBTN_R1, Btn_R1),
         std::make_pair(OPT_PSBTN_TRIANGLE, Btn_TRIANGLE),
         std::make_pair(OPT_PSBTN_CIRCLE, Btn_CIRCLE),
         std::make_pair(OPT_PSBTN_CROSS, Btn_CROSS),
         std::make_pair(OPT_PSBTN_SQUARE, Btn_SQUARE),
         std::make_pair(OPT_PSBTN_SELECT, Btn_SELECT),
-//        std::make_pair(OPT_PSBTN_L3, Btn_L3),
-//        std::make_pair(OPT_PSBTN_R3, Btn_R3),
         std::make_pair(OPT_PSBTN_START, Btn_START),
-//        std::make_pair(OPT_PSBTN_UP, Btn_UP),
-//        std::make_pair(OPT_PSBTN_RIGHT, Btn_RIGHT),
-//        std::make_pair(OPT_PSBTN_DOWN, Btn_DOWN),
-//        std::make_pair(OPT_PSBTN_LEFT, Btn_LEFT),
         std::make_pair(OPT_PSBTN_PS, Btn_PS),
         std::make_pair(OPT_PSBTN_MOVE, Btn_MOVE),
-        std::make_pair(OPT_PSBTN_T, Btn_T)
+        std::make_pair(OPT_PSBTN_T, Btn_T),
+        std::make_pair(OPT_PSBTN_1_TRIANGLE, Btn_TRIANGLE),
+        std::make_pair(OPT_PSBTN_1_CIRCLE, Btn_CIRCLE),
+        std::make_pair(OPT_PSBTN_1_CROSS, Btn_CROSS),
+        std::make_pair(OPT_PSBTN_1_SQUARE, Btn_SQUARE),
+        std::make_pair(OPT_PSBTN_1_SELECT, Btn_SELECT),
+        std::make_pair(OPT_PSBTN_1_START, Btn_START),
+        std::make_pair(OPT_PSBTN_1_PS, Btn_PS),
+        std::make_pair(OPT_PSBTN_1_MOVE, Btn_MOVE),
+        std::make_pair(OPT_PSBTN_1_T, Btn_T)
     },
     linmap_ {
         std::make_pair("KEY_ESC", KEY_ESC),

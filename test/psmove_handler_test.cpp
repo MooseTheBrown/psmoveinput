@@ -55,9 +55,10 @@ public:
     {
         dummyLog_ = new psmoveinput::Log(psmoveinput::LogParams("dummylog",
                                                                 psmoveinput::LogLevel::INFO));
-        psmoveinput::key_map keymap{{Btn_CROSS, KEY_X}, {Btn_START, KEY_ENTER}};
+        psmoveinput::key_map keymap1{{Btn_CROSS, KEY_X}, {Btn_START, KEY_ENTER}};
+        psmoveinput::key_map keymap2{{Btn_CROSS, KEY_SPACE}, {Btn_START, KEY_DOWN}};
         psmoveinput::MoveCoeffs coeffs{0.5, 2.0};
-        handler_ = new psmoveinput::PSMoveHandler(keymap, coeffs, 100, *dummyLog_);
+        handler_ = new psmoveinput::PSMoveHandler(keymap1, keymap2, coeffs, 100, *dummyLog_);
         handler_->getMoveSignal().connect(boost::bind(&TestListener::onMove,
                                                       &listener_,
                                                       _1, _2));
@@ -109,28 +110,47 @@ TEST_F(PSMoveHandlerTest, Gyroscope)
 
 TEST_F(PSMoveHandlerTest, CorrectButtons)
 {
-    // report correct keys, which are present in the handler's keymap
-    handler_->onButtons(Btn_CROSS);
+    // report correct keys, which are present in the handler's keymaps
+
+    // first controller
+    handler_->onButtons(Btn_CROSS, psmoveinput::ControllerId::FIRST);
     ASSERT_EQ(KEY_X, listener_.code_);
     ASSERT_EQ(true, listener_.pressed_);
 
-    handler_->onButtons(0);
+    handler_->onButtons(0, psmoveinput::ControllerId::FIRST);
     ASSERT_EQ(KEY_X, listener_.code_);
     ASSERT_EQ(false, listener_.pressed_);
 
-    handler_->onButtons(Btn_START);
+    handler_->onButtons(Btn_START, psmoveinput::ControllerId::FIRST);
     ASSERT_EQ(KEY_ENTER, listener_.code_);
     ASSERT_EQ(true, listener_.pressed_);
 
-    handler_->onButtons(0);
+    handler_->onButtons(0, psmoveinput::ControllerId::FIRST);
     ASSERT_EQ(KEY_ENTER, listener_.code_);
+    ASSERT_EQ(false, listener_.pressed_);
+
+    // second controller
+    handler_->onButtons(Btn_CROSS, psmoveinput::ControllerId::SECOND);
+    ASSERT_EQ(KEY_SPACE, listener_.code_);
+    ASSERT_EQ(true, listener_.pressed_);
+
+    handler_->onButtons(0, psmoveinput::ControllerId::SECOND);
+    ASSERT_EQ(KEY_SPACE, listener_.code_);
+    ASSERT_EQ(false, listener_.pressed_);
+
+    handler_->onButtons(Btn_START, psmoveinput::ControllerId::SECOND);
+    ASSERT_EQ(KEY_DOWN, listener_.code_);
+    ASSERT_EQ(true, listener_.pressed_);
+
+    handler_->onButtons(0, psmoveinput::ControllerId::SECOND);
+    ASSERT_EQ(KEY_DOWN, listener_.code_);
     ASSERT_EQ(false, listener_.pressed_);
 }
 
 TEST_F(PSMoveHandlerTest, IncorrectButtons)
 {
     // report keys, which are not present in the handler's key map
-    handler_->onButtons(Btn_SELECT);
+    handler_->onButtons(Btn_SELECT, psmoveinput::ControllerId::FIRST);
     ASSERT_EQ(0, listener_.code_);
     ASSERT_EQ(false, listener_.pressed_);
 }

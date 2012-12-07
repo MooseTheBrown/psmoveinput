@@ -23,23 +23,28 @@
 #ifndef PSMOVEINPUT_PSMOVE_LISTENER_HPP
 #define PSMOVEINPUT_PSMOVE_LISTENER_HPP
 
-#include <boost/signals2.hpp>
-#include <psmoveapi/psmove.h>
 #include "log.hpp"
+#include <boost/signals2.hpp>
+#include <boost/thread/thread.hpp>
+#include <boost/thread/mutex.hpp>
+#include <psmoveapi/psmove.h>
+#include <time.h>
 
 namespace psmoveinput
 {
 
 typedef boost::signals2::signal<void (int, int)> gyro_signal;
-typedef boost::signals2::signal<void (int)> button_signal;
+typedef boost::signals2::signal<void (int, ControllerId)> button_signal;
 
 class PSMoveListener
 {
 public:
 // default timeout values (ms)
 // TODO: make configurable
-#define DEFAULT_POLL_TIMEOUT    10
+#define DEFAULT_POLL_TIMEOUT    20
 #define DEFAULT_CONN_TIMEOUT    10000
+// controller disconnect timeout (s)
+#define DISCONNECT_TIMEOUT      5
 
     PSMoveListener(Log &log,
                    OpMode mode,
@@ -50,22 +55,49 @@ public:
     gyro_signal &getGyroSignal() { return gyroSignal_; }
     button_signal &getButtonSignal() { return buttonSignal_; }
     void run();
-    void stop() { stop_ = true; }
+    void stop();
+    bool needToStop() { return stop_; }
 
 protected:
+
+    // controller thread manages connection to single PSMove controller
+    // and invokes listener's signals on getting input events
+    class ControllerThread
+    {
+    public:
+        ControllerThread(Log &log);
+        virtual ~ControllerThread();
+
+        void start(ControllerId id, PSMove *move, PSMoveListener *listener, int pollTimeout);
+        void join() { if (thread_ != nullptr) thread_->join(); }
+        bool running();
+        void operator ()();
+
+    protected:
+        ControllerId id_;
+        PSMove *move_;
+        PSMoveListener* listener_;
+        boost::thread *thread_;
+        boost::mutex mutex_;
+        Log &log_;
+        int pollTimeout_;
+        int buttons_;
+        timespec lastTp_;
+    };
+
     gyro_signal gyroSignal_;
     button_signal buttonSignal_;
-    PSMove *move_;
     Log &log_;
     int pollTimeout_;
     int connectTimeout_;
     bool stop_;
-    int buttons_;
     OpMode mode_;
+    ControllerThread *controllerThreads_[MAX_CONTROLLERS];
 
-    void connect();
     void init();
     bool checkMoved();
+    void handleNewDevice(PSMove *move);
+
 };
 
 } // namespace psmoveinput

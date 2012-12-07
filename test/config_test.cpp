@@ -124,10 +124,10 @@ TEST(ConfigTest, CorrectConfig)
     // check operation mode
     ASSERT_EQ(psmoveinput::OpMode::CLIENT, config.getOpMode());
 
-    // check key map
-    psmoveinput::key_map keymap = config.getKeyMap();
-    ASSERT_EQ(3, keymap.size());
-    for (psmoveinput::KeyMapEntry entry : keymap)
+    // check key maps
+    psmoveinput::key_map keymap1 = config.getKeyMap(psmoveinput::ControllerId::FIRST);
+    ASSERT_EQ(3, keymap1.size());
+    for (psmoveinput::KeyMapEntry entry : keymap1)
     {
         if (entry.pscode == Btn_CROSS)
         {
@@ -140,6 +140,27 @@ TEST(ConfigTest, CorrectConfig)
         else if (entry.pscode == Btn_TRIANGLE)
         {
             ASSERT_EQ(KEY_1, entry.lincode);
+        }
+        else
+        {
+            ASSERT_TRUE(false);
+        }
+    }
+    psmoveinput::key_map keymap2 = config.getKeyMap(psmoveinput::ControllerId::SECOND);
+    ASSERT_EQ(3, keymap2.size());
+    for (psmoveinput::KeyMapEntry entry : keymap2)
+    {
+        if (entry.pscode == Btn_CROSS)
+        {
+            ASSERT_EQ(KEY_F1, entry.lincode);
+        }
+        else if (entry.pscode == Btn_T)
+        {
+            ASSERT_EQ(KEY_F2, entry.lincode);
+        }
+        else if (entry.pscode == Btn_TRIANGLE)
+        {
+            ASSERT_EQ(KEY_F3, entry.lincode);
         }
         else
         {

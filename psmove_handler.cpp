@@ -26,11 +26,11 @@
 namespace psmoveinput
 {
 
-PSMoveHandler::PSMoveHandler(const key_map &keymap,
+PSMoveHandler::PSMoveHandler(const key_map &keymap1,
+                             const key_map &keymap2,
                              const MoveCoeffs &coeffs,
                              int moveThreshold,
                              Log &log) :
-    keymap_(keymap),
     buttons_(0),
     log_(log),
     moveThreshold_(moveThreshold)
@@ -40,6 +40,9 @@ PSMoveHandler::PSMoveHandler(const key_map &keymap,
 
     lastGyroTp_.tv_sec = 0;
     lastGyroTp_.tv_nsec = 0;
+    
+    keymaps_[0] = keymap1;
+    keymaps_[1]= keymap2;
 }
 
 PSMoveHandler::~PSMoveHandler()
@@ -94,7 +97,7 @@ void PSMoveHandler::onGyroscope(int gx, int gy)
     lastGyroTp_.tv_nsec = gyroTp.tv_nsec;
 }
 
-void PSMoveHandler::onButtons(int buttons)
+void PSMoveHandler::onButtons(int buttons, ControllerId controller)
 {
     log_.write(boost::str(boost::format("PSMoveHandler::onButtons(%1%)") % buttons).c_str());
     log_.write(boost::str(boost::format("PSMoveHandler::buttons_ = %1%") % buttons_).c_str());
@@ -109,11 +112,11 @@ void PSMoveHandler::onButtons(int buttons)
         {
             if (pressed & i)
             {
-                reportKey(i, true);
+                reportKey(i, true, controller);
             }
             else if (released & i)
             {
-                reportKey(i, false);
+                reportKey(i, false, controller);
             }
         }
 
@@ -121,25 +124,22 @@ void PSMoveHandler::onButtons(int buttons)
     }
 }
 
-/*int PSMoveHandler::getIndex(int button)
+void PSMoveHandler::reportKey(int button, bool pressed, ControllerId controller)
 {
-    // get button's index in internal keymap
-    int ret = 0;
+    key_map *keymap = nullptr;
 
-    while (button != 1)
+    if (controller == ControllerId::FIRST)
     {
-        button >>= 1;
-        ret++;
+        keymap = &keymaps_[0];
+    }
+    else
+    {
+        keymap = &keymaps_[1];
     }
 
-    return ret;
-}*/
-
-void PSMoveHandler::reportKey(int button, bool pressed)
-{
     log_.write(boost::str(boost::format("PSMoveHandler::reportKey(%1%, %2%)") % button % pressed).c_str());
 
-    for (KeyMapEntry entry : keymap_)
+    for (KeyMapEntry entry : *keymap)
     {
         if (entry.pscode == button)
         {
