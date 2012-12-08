@@ -76,6 +76,7 @@ if (BUILD_UNIT_TESTS)
                             ${psmoveinput_SOURCE_DIR}/test/main.cpp
                             ${psmoveinput_SOURCE_DIR}/test/input_device_test.cpp
                             ${psmoveinput_SOURCE_DIR}/test/psmove_handler_test.cpp
+                            ${psmoveinput_SOURCE_DIR}/test/psmove_handler_mt_test.cpp
                             ${psmoveinput_SOURCE_DIR}/test/config_test.cpp
                             ${psmoveinput_SOURCE_DIR}/test/log_test.cpp )
     add_executable (psmoveinput-test EXCLUDE_FROM_ALL ${PSMOVEINPUT_UT_SRC})

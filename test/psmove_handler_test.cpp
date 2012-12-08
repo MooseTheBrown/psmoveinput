@@ -23,7 +23,7 @@
 #include "psmove_handler.hpp"
 #include "gtest/gtest.h"
 #include <boost/bind.hpp>
-#include <boost/thread.hpp>
+#include <boost/thread/thread.hpp>
 
 namespace psmovehandler_test
 {

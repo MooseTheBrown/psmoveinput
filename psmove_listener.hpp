@@ -42,9 +42,11 @@ public:
 // default timeout values (ms)
 // TODO: make configurable
 #define DEFAULT_POLL_TIMEOUT    20
-#define DEFAULT_CONN_TIMEOUT    10000
+#define DEFAULT_CONN_TIMEOUT    5000
 // controller disconnect timeout (s)
-#define DISCONNECT_TIMEOUT      5
+#define DISCONNECT_TIMEOUT      7
+// LED update timeout (ms)
+#define LED_TIMEOUT             4000
 
     PSMoveListener(Log &log,
                    OpMode mode,
@@ -56,7 +58,8 @@ public:
     button_signal &getButtonSignal() { return buttonSignal_; }
     void run();
     void stop();
-    bool needToStop() { return stop_; }
+    bool needToStop() { return (stop_ || threadStop_); }
+    void onDisconnect();
 
 protected:
 
@@ -78,11 +81,14 @@ protected:
         PSMove *move_;
         PSMoveListener* listener_;
         boost::thread *thread_;
-        boost::mutex mutex_;
         Log &log_;
         int pollTimeout_;
         int buttons_;
         timespec lastTp_;
+        int pollCount_;
+
+        void setLeds();
+        void updateLeds();
     };
 
     gyro_signal gyroSignal_;
@@ -93,10 +99,13 @@ protected:
     bool stop_;
     OpMode mode_;
     ControllerThread *controllerThreads_[MAX_CONTROLLERS];
+    boost::mutex mutex_;
+    bool threadStop_;
 
     void init();
     bool checkMoved();
     void handleNewDevice(PSMove *move);
+    int countRunningThreads();
 
 };
 

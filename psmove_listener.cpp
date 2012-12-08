@@ -36,11 +36,12 @@ PSMoveListener::PSMoveListener(Log &log,
     pollTimeout_(pollTimeout),
     connectTimeout_(connectTimeout),
     stop_(false),
-    mode_(mode)
+    mode_(mode),
+    threadStop_(false)
 {
-    for (ControllerThread *thread : controllerThreads_)
+    for (int i = 0; i < MAX_CONTROLLERS; i++)
     {
-        thread = new ControllerThread(log_);
+        controllerThreads_[i] = new ControllerThread(log_);
     }
 }
 
@@ -49,11 +50,11 @@ PSMoveListener::~PSMoveListener()
     gyroSignal_.disconnect_all_slots();
     buttonSignal_.disconnect_all_slots();
 
-    for (ControllerThread *thread : controllerThreads_)
+    for (int i = 0; i < MAX_CONTROLLERS; i++)
     {
-        if (thread != nullptr)
+        if (controllerThreads_[i] != nullptr)
         {
-            delete thread;
+            delete controllerThreads_[i];
         }
     }
 }
@@ -61,30 +62,44 @@ PSMoveListener::~PSMoveListener()
 void PSMoveListener::run()
 {
     PSMove *move = nullptr;
-    int connected = 0;
+    int psmoveId = 0;
 
     init();
 
-    // main listener loop
+    log_.write("PSMoveListener: starting main loop");
+
+    // main listener loop : establish and handle controller connections
     while (true)
     {
-        if (stop_)
+        if (stop_ || threadStop_)
         {
-            log_.write("Stopping PSMoveListener");
             // wait until all controller threads complete execution
-            for (ControllerThread *thread : controllerThreads_)
+            for (int i = 0; i < MAX_CONTROLLERS; i++)
             {
-                if (thread->running() == true)
+                if (controllerThreads_[i]->running() == true)
                 {
-                    thread->join();
+                    controllerThreads_[i]->join();
                 }
             }
-            break;
+
+            if (stop_)
+            {
+                // we're not just stopping controller threads,
+                // the listener itself has to stop working
+                log_.write("Stopping PSMoveListener");
+                break;
+            }
+            else
+            {
+                // no need to use mutex here because at this poing there's only one
+                // main thread remaining
+                threadStop_ = false;
+            }
         }
 
-        // are there any new controllers availalbe?
-        connected = psmove_count_connected();
-        move = psmove_connect_by_id(connected);
+        psmoveId = countRunningThreads();
+        log_.write(boost::str(boost::format("Trying to connect to controller with id=%1%") % psmoveId).c_str());
+        move = psmove_connect_by_id(psmoveId);
         if (move != nullptr)
         {
             log_.write("Found new PSMove device");
@@ -103,6 +118,17 @@ void PSMoveListener::stop()
 
 void PSMoveListener::init()
 {
+    std::string modestr;
+    if (mode_ == OpMode::STANDALONE)
+    {
+        modestr = "standalone";
+    }
+    else
+    {
+        modestr = "client";
+    }
+    log_.write(boost::str(boost::format("PSMoveListener initializing in %1% mode") % modestr).c_str());
+
     // in moved client mode we need to check if moved is running,
     // and if it is, then make psmoveapi ignore all hidapi controllers
     if (mode_ == OpMode::CLIENT)
@@ -119,6 +145,10 @@ void PSMoveListener::init()
             log_.write("Launched in client mode, but couldn't find moved", LogLevel::ERROR);
             log_.write("Forcing standalone mode", LogLevel::ERROR);
         }
+    }
+    else
+    {
+        psmove_set_remote_config(PSMove_OnlyLocal);
     }
 }
 
@@ -147,6 +177,32 @@ void PSMoveListener::handleNewDevice(PSMove *move)
     }
 }
 
+int PSMoveListener::countRunningThreads()
+{
+    int ret = 0;
+
+    for (int i = 0; i < MAX_CONTROLLERS; i++)
+    {
+        if (controllerThreads_[i]->running() == true)
+        {
+            ret++;
+        }
+    }
+
+    return ret;
+}
+
+void PSMoveListener::onDisconnect()
+{
+    // to avoid messing up controller ids on single controller disconnect
+    // we kill all controller threads
+    boost::lock_guard<boost::mutex> lock(mutex_);
+    threadStop_ = true;
+
+    // controller threads for still connected controllers will be
+    // re-created on next main listener loop iteration
+}
+
 
 
 
@@ -158,7 +214,8 @@ PSMoveListener::ControllerThread::ControllerThread(Log &log) :
     thread_(nullptr),
     log_(log),
     pollTimeout_(DEFAULT_POLL_TIMEOUT),
-    buttons_(0)
+    buttons_(0),
+    pollCount_(0)
 {
     lastTp_.tv_sec = 0;
     lastTp_.tv_nsec = 0;
@@ -177,18 +234,11 @@ void PSMoveListener::ControllerThread::start(ControllerId id,
                                              PSMoveListener *listener,
                                              int pollTimeout)
 {
-    bool running = false;
-
     // only start new thread if there isn't one already running
+    if (thread_ == nullptr)
     {
-        boost::lock_guard<boost::mutex> lock(mutex_);
-        if (thread_ != nullptr)
-        {
-            running = true;
-        }
-    }
-    if (running == false)
-    {
+        int num = (id == ControllerId::FIRST) ? 0 : 1;
+        log_.write(boost::str(boost::format("Starting controller thread for controller #%1%") %num).c_str());
         id_ = id;
         move_ = move;
         listener_ = listener;
@@ -214,6 +264,8 @@ void PSMoveListener::ControllerThread::operator ()()
         return;
     }
 
+    setLeds();
+
     // thread main loop
     while (true)
     {
@@ -221,15 +273,18 @@ void PSMoveListener::ControllerThread::operator ()()
 
         if (listener_->needToStop() == true)
         {
-            log_.write(boost::str(boost::format("Stopping controller thread for controller #%1%") %static_cast<int>(id_)).c_str());
             break;
         }
 
         // fetch data from PSMove as long as there is something to fetch
         while (psmove_poll(move_))
         {
-            psmove_get_gyroscope(move_, &gx, &gy, &gz);
-            listener_->getGyroSignal()(-gz, -gx);
+            // only the first controller moves the mouse pointer
+            if (id_ == ControllerId::FIRST)
+            {
+                psmove_get_gyroscope(move_, &gx, &gy, &gz);
+                listener_->getGyroSignal()(-gz, -gx);
+            }
 
             buttons = psmove_get_buttons(move_);
             if (buttons_ != buttons)
@@ -245,25 +300,66 @@ void PSMoveListener::ControllerThread::operator ()()
         // if controller does not give data updates for a specific period
         // of time, consider it disconnected and stop the thread
         clock_gettime(CLOCK_MONOTONIC_RAW, &tp);
-        if ((tp.tv_sec - lastTp_.tv_sec) > DISCONNECT_TIMEOUT)
+        if (lastTp_.tv_sec != 0)
         {
-            break;
+            if ((tp.tv_sec - lastTp_.tv_sec) > DISCONNECT_TIMEOUT)
+            {
+                break;
+            }
         }
+
+        updateLeds();
         
         boost::this_thread::sleep(boost::posix_time::millisec(pollTimeout_));
     }
+
+    int num = (id_ == ControllerId::FIRST) ? 0 : 1;
+    log_.write(boost::str(boost::format("Stopping controller thread for controller #%1%") %num).c_str());
     
     // the thread is about to stop, so we don't need thread object anymore
     {
-        boost::lock_guard<boost::mutex> lock(mutex_);
         thread_->detach();
         delete thread_;
         thread_ = nullptr;
+        lastTp_.tv_sec = 0;
+        lastTp_.tv_nsec = 0;
     }
     
     // clean up
     psmove_disconnect(move_);
     move_ = nullptr;
+    // notify the listener
+    listener_->onDisconnect();
+}
+
+void PSMoveListener::ControllerThread::setLeds()
+{
+    if (move_ == nullptr )
+    {
+        return;
+    }
+
+    // TODO: make colors configurable
+
+    if (id_ == ControllerId::FIRST)
+    {
+        psmove_set_leds(move_, 33, 119, 47);
+    }
+    else
+    {
+        psmove_set_leds(move_, 123, 59, 160);
+    }
+    psmove_update_leds(move_);
+}
+
+void PSMoveListener::ControllerThread::updateLeds()
+{
+    pollCount_++;
+    if (pollCount_ > (LED_TIMEOUT / pollTimeout_))
+    {
+        pollCount_ = 0;
+        psmove_update_leds(move_);
+    }
 }
 
 } // namespace psmoveinput

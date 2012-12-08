@@ -28,6 +28,7 @@
 #include <linux/input.h>
 #include <psmoveapi/psmove.h>
 #include <boost/signals2.hpp>
+#include <boost/thread/mutex.hpp>
 #include <time.h>
 #include <map>
 
@@ -58,10 +59,11 @@ protected:
     key_signal key_signal_;
     key_map keymaps_[MAX_CONTROLLERS];
     MoveCoeffs coeffs_;
-    int buttons_;
+    int buttons_[MAX_CONTROLLERS];
     Log &log_;
     int moveThreshold_;
     timespec lastGyroTp_;
+    boost::mutex mutex_;
 
     void reportKey(int button, bool pressed, ControllerId controller);
 };

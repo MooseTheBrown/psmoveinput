@@ -31,7 +31,6 @@ PSMoveHandler::PSMoveHandler(const key_map &keymap1,
                              const MoveCoeffs &coeffs,
                              int moveThreshold,
                              Log &log) :
-    buttons_(0),
     log_(log),
     moveThreshold_(moveThreshold)
 {
@@ -43,6 +42,9 @@ PSMoveHandler::PSMoveHandler(const key_map &keymap1,
     
     keymaps_[0] = keymap1;
     keymaps_[1]= keymap2;
+
+    buttons_[0] = 0;
+    buttons_[1] = 0;
 }
 
 PSMoveHandler::~PSMoveHandler()
@@ -99,13 +101,17 @@ void PSMoveHandler::onGyroscope(int gx, int gy)
 
 void PSMoveHandler::onButtons(int buttons, ControllerId controller)
 {
+    boost::lock_guard<boost::mutex> lock(mutex_);
+
     log_.write(boost::str(boost::format("PSMoveHandler::onButtons(%1%)") % buttons).c_str());
     log_.write(boost::str(boost::format("PSMoveHandler::buttons_ = %1%") % buttons_).c_str());
 
-    if (buttons_ != buttons)
+    int buttonIndex = (controller == ControllerId::FIRST) ? 0 : 1;
+
+    if (buttons_[buttonIndex] != buttons)
     {
-        int pressed = (buttons & ~buttons_);
-        int released = (buttons_ & ~buttons);
+        int pressed = (buttons & ~buttons_[buttonIndex]);
+        int released = (buttons_[buttonIndex] & ~buttons);
 
 
         for (int i = 1; i <= Btn_T; i <<= 1)
@@ -120,7 +126,7 @@ void PSMoveHandler::onButtons(int buttons, ControllerId controller)
             }
         }
 
-        buttons_ = buttons;
+        buttons_[buttonIndex] = buttons;
     }
 }
 
