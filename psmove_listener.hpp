@@ -42,7 +42,7 @@ public:
 // default timeout values (ms)
 // TODO: make configurable
 #define DEFAULT_POLL_TIMEOUT    20
-#define DEFAULT_CONN_TIMEOUT    5000
+#define DEFAULT_CONN_TIMEOUT    3000
 // controller disconnect timeout (s)
 #define DISCONNECT_TIMEOUT      7
 // LED update timeout (ms)
@@ -71,10 +71,15 @@ protected:
         ControllerThread(Log &log);
         virtual ~ControllerThread();
 
-        void start(ControllerId id, PSMove *move, PSMoveListener *listener, int pollTimeout);
+        void start(ControllerId id,
+                   int psmoveId,
+                   PSMove *move,
+                   PSMoveListener *listener,
+                   int pollTimeout);
         void join() { if (thread_ != nullptr) thread_->join(); }
         bool running();
         void operator ()();
+        int getPSMoveId() { return psmoveId_; }
 
     protected:
         ControllerId id_;
@@ -86,6 +91,7 @@ protected:
         int buttons_;
         timespec lastTp_;
         int pollCount_;
+        int psmoveId_;
 
         void setLeds();
         void updateLeds();
@@ -104,9 +110,9 @@ protected:
 
     void init();
     bool checkMoved();
-    void handleNewDevice(PSMove *move);
-    int countRunningThreads();
-
+    void handleNewDevice(int psmoveId, PSMove *move);
+    PSMove *connect(int &psmoveId); 
+    bool isFullCapacity();
 };
 
 } // namespace psmoveinput

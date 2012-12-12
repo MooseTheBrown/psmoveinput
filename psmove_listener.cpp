@@ -76,10 +76,7 @@ void PSMoveListener::run()
             // wait until all controller threads complete execution
             for (int i = 0; i < MAX_CONTROLLERS; i++)
             {
-                if (controllerThreads_[i]->running() == true)
-                {
-                    controllerThreads_[i]->join();
-                }
+                controllerThreads_[i]->join();
             }
 
             if (stop_)
@@ -97,14 +94,17 @@ void PSMoveListener::run()
             }
         }
 
-        psmoveId = countRunningThreads();
-        log_.write(boost::str(boost::format("Trying to connect to controller with id=%1%") % psmoveId).c_str());
-        move = psmove_connect_by_id(psmoveId);
-        if (move != nullptr)
+        // try to connect to new controller if there is less than
+        // maximum number of controllers already connected
+        if (isFullCapacity() == false)
         {
-            log_.write("Found new PSMove device");
-            handleNewDevice(move);
-            move = nullptr;
+            move = connect(psmoveId);
+            if (move != nullptr)
+            {
+                log_.write(boost::str(boost::format("Connected to PSMove, psmoveapi id = %1%") % psmoveId).c_str());
+                handleNewDevice(psmoveId, move);
+                move = nullptr;
+            }
         }
 
         boost::this_thread::sleep(boost::posix_time::millisec(connectTimeout_));
@@ -165,31 +165,16 @@ bool PSMoveListener::checkMoved()
     }
 }
 
-void PSMoveListener::handleNewDevice(PSMove *move)
+void PSMoveListener::handleNewDevice(int psmoveId, PSMove *move)
 {
     if (controllerThreads_[0]->running() == false)
     {
-        controllerThreads_[0]->start(ControllerId::FIRST, move, this, pollTimeout_);
+        controllerThreads_[0]->start(ControllerId::FIRST, psmoveId, move, this, pollTimeout_);
     }
     else if (controllerThreads_[1]->running() == false)
     {
-        controllerThreads_[1]->start(ControllerId::SECOND, move, this, pollTimeout_);
+        controllerThreads_[1]->start(ControllerId::SECOND, psmoveId, move, this, pollTimeout_);
     }
-}
-
-int PSMoveListener::countRunningThreads()
-{
-    int ret = 0;
-
-    for (int i = 0; i < MAX_CONTROLLERS; i++)
-    {
-        if (controllerThreads_[i]->running() == true)
-        {
-            ret++;
-        }
-    }
-
-    return ret;
 }
 
 void PSMoveListener::onDisconnect()
@@ -201,6 +186,51 @@ void PSMoveListener::onDisconnect()
 
     // controller threads for still connected controllers will be
     // re-created on next main listener loop iteration
+}
+
+PSMove *PSMoveListener::connect(int &psmoveId)
+{
+    // find correct psmoveapi id of controller to connect
+    for (psmoveId = 0; psmoveId < MAX_CONTROLLERS; psmoveId++)
+    {
+        // check if there is a running controller thread with this id
+        bool exists = false;
+        for (int i = 0; i < MAX_CONTROLLERS; i++)
+        {
+            if ((controllerThreads_[i]->running() == true) &&
+                (controllerThreads_[i]->getPSMoveId() == psmoveId))
+            {
+                exists = true;
+                break;
+            }
+        }
+
+        if (exists == false)
+        {
+            // no thread handles controller with this id, so try to connect to it
+            break;
+        }
+    }
+
+    PSMove *move = nullptr;
+    move = psmove_connect_by_id(psmoveId);
+    return move;
+}
+
+bool PSMoveListener::isFullCapacity()
+{
+    bool isFull = true;
+
+    for (int i = 0; i < MAX_CONTROLLERS; i++)
+    {
+        if (controllerThreads_[i]->running() == false)
+        {
+            isFull = false;
+            break;
+        }
+    }
+
+    return isFull;
 }
 
 
@@ -215,7 +245,8 @@ PSMoveListener::ControllerThread::ControllerThread(Log &log) :
     log_(log),
     pollTimeout_(DEFAULT_POLL_TIMEOUT),
     buttons_(0),
-    pollCount_(0)
+    pollCount_(0),
+    psmoveId_(0)
 {
     lastTp_.tv_sec = 0;
     lastTp_.tv_nsec = 0;
@@ -230,6 +261,7 @@ PSMoveListener::ControllerThread::~ControllerThread()
 }
 
 void PSMoveListener::ControllerThread::start(ControllerId id,
+                                             int psmoveId,
                                              PSMove *move,
                                              PSMoveListener *listener,
                                              int pollTimeout)
@@ -240,6 +272,7 @@ void PSMoveListener::ControllerThread::start(ControllerId id,
         int num = (id == ControllerId::FIRST) ? 0 : 1;
         log_.write(boost::str(boost::format("Starting controller thread for controller #%1%") %num).c_str());
         id_ = id;
+        psmoveId_ = psmoveId;
         move_ = move;
         listener_ = listener;
         pollTimeout_ = pollTimeout;
@@ -317,13 +350,11 @@ void PSMoveListener::ControllerThread::operator ()()
     log_.write(boost::str(boost::format("Stopping controller thread for controller #%1%") %num).c_str());
     
     // the thread is about to stop, so we don't need thread object anymore
-    {
-        thread_->detach();
-        delete thread_;
-        thread_ = nullptr;
-        lastTp_.tv_sec = 0;
-        lastTp_.tv_nsec = 0;
-    }
+    thread_->detach();
+    delete thread_;
+    thread_ = nullptr;
+    lastTp_.tv_sec = 0;
+    lastTp_.tv_nsec = 0;
     
     // clean up
     psmove_disconnect(move_);
