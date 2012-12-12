@@ -43,7 +43,8 @@ Config::Config() :
     config_file_(DEF_CONFIGFILE),
     config_file_set_(false),
     opmode_(OpMode::STANDALONE),
-    opmode_set_(false)
+    opmode_set_(false),
+    foreground_(false)
 {
     // command line options description
     optdesc_.add_options()
@@ -52,7 +53,8 @@ Config::Config() :
         (OPT_PID, po::value<std::string>(), OPT_PID_DESC)
         (OPT_LOG, po::value<char>(), OPT_LOG_DESC)
         (OPT_CONFIG, po::value<std::string>(), OPT_CONFIG_DESC)
-        (OPT_MODE, po::value<std::string>(), OPT_MODE_DESC);
+        (OPT_MODE, po::value<std::string>(), OPT_MODE_DESC)
+        (OPT_FOREGROUND, OPT_FOREGROUND_DESC);
 
     // config file options description
     configdesc_.add_options()
@@ -156,6 +158,10 @@ void Config::handleCmdLine()
             if (opts_.count(OPT_MODE_ONLYLONG))
             {
                 getModeFromString(opts_[OPT_MODE_ONLYLONG].as<std::string>());
+            }
+            if (opts_.count(OPT_FOREGROUND_ONLYLONG))
+            {
+                foreground_ = true;
             }
             ok_ = true;
         }

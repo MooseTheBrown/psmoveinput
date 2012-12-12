@@ -45,6 +45,9 @@ namespace psmoveinput
 #define OPT_MODE "mode,m"
 #define OPT_MODE_DESC "operation mode"
 #define OPT_MODE_ONLYLONG "mode"
+#define OPT_FOREGROUND "foreground,f"
+#define OPT_FOREGROUND_DESC "run in foreground, do not fork"
+#define OPT_FOREGROUND_ONLYLONG "foreground"
 // config file options
 #define OPT_CONF_PID "PID_FILE"
 #define OPT_CONF_LOG "LOG_LEVEL"

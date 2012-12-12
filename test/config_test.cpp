@@ -31,7 +31,7 @@ namespace psmoveconfig_test
 
 TEST(ConfigTest, CommandLine)
 {
-    const char *argv[9];
+    const char *argv[10];
     psmoveinput::Config config;
     
     // program name
@@ -48,18 +48,21 @@ TEST(ConfigTest, CommandLine)
     // operation mode
     argv[7] = "-m";
     argv[8] = "client";
+    // foreground mode
+    argv[9] = "-f";
 
-    config.parse(9, const_cast<char**>(argv));
+    config.parse(10, const_cast<char**>(argv));
     ASSERT_EQ(true, config.isOK());
     ASSERT_STREQ("/var/run/testpidfile", config.getPidFileName());
     ASSERT_STREQ("/nonexistent", config.getConfigFileName());
     ASSERT_EQ(psmoveinput::LogLevel::INFO, config.getLogLevel());
     ASSERT_EQ(psmoveinput::OpMode::CLIENT, config.getOpMode());
+    ASSERT_EQ(true, config.getForeground());
 
     // mess up command line a bit
     psmoveinput::Config invalid_config;
     argv[4] = "blah";
-    invalid_config.parse(9, const_cast<char**>(argv));
+    invalid_config.parse(10, const_cast<char**>(argv));
     ASSERT_EQ(false, invalid_config.isOK());
 
     // mess up command line totally
@@ -71,7 +74,7 @@ TEST(ConfigTest, CommandLine)
 
 TEST(ConfigTest, LongOptions)
 {
-    const char *argv[9];
+    const char *argv[10];
     psmoveinput::Config config;
 
     // program name
@@ -88,13 +91,16 @@ TEST(ConfigTest, LongOptions)
     // operation mode
     argv[7] = "--mode";
     argv[8] = "client";
+    // foreground mode
+    argv[9] = "--foreground";
 
-    config.parse(9, const_cast<char**>(argv));
+    config.parse(10, const_cast<char**>(argv));
     ASSERT_EQ(true, config.isOK());
     ASSERT_STREQ("/var/run/testpidfile", config.getPidFileName());
     ASSERT_STREQ("/nonexistent", config.getConfigFileName());
     ASSERT_EQ(psmoveinput::LogLevel::INFO, config.getLogLevel());
     ASSERT_EQ(psmoveinput::OpMode::CLIENT, config.getOpMode());
+    ASSERT_EQ(true, config.getForeground());
 }
 
 TEST(ConfigTest, CorrectConfig)

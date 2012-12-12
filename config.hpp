@@ -62,6 +62,8 @@ public:
     bool versionRequested() { return version_; }
     // get error message; meaningful only in case isOK() returns false
     std::string error() { return error_; }
+    // get fork mode
+    bool getForeground() { return foreground_; }
 
 protected:
     boost::program_options::variables_map opts_;
@@ -83,6 +85,7 @@ protected:
     KeyMapParser keymap_parser_;
     OpMode opmode_;
     bool opmode_set_;
+    bool foreground_;
     
     void handleCmdLine();
     void getLogFromChar(char l);

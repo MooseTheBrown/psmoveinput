@@ -104,7 +104,6 @@ int PSMoveInput::run(int argc, char **argv)
         setupLog();
         checkPidFile();
 
-        std::cout << "Forking to background..." << std::endl;
         daemonize();
 
         setupSignals();
@@ -234,33 +233,37 @@ void PSMoveInput::daemonize()
 {
     pid_t pid;
 
-    pid = fork();
-    if (pid < 0)
+    if (config_.getForeground() == false) // don't fork in foreground mode
     {
-        throw Exception(ex_type::FORK_FAILED);
-    }
+        std::cout << "Forking to background..." << std::endl;
+        pid = fork();
+        if (pid < 0)
+        {
+            throw Exception(ex_type::FORK_FAILED);
+        }
 
-    if (pid > 0)
-    {
-        // exit from the parent
-        throw Exception(ex_type::PARENT_QUIT);
-    }
+        if (pid > 0)
+        {
+            // exit from the parent
+            throw Exception(ex_type::PARENT_QUIT);
+        }
 
-    umask(0);
-    pid_t sid = setsid();
-    if (sid < 0)
-    {
-        throw Exception(ex_type::FORK_FAILED);
-    }
+        umask(0);
+        pid_t sid = setsid();
+        if (sid < 0)
+        {
+            throw Exception(ex_type::FORK_FAILED);
+        }
 
-    if (chdir("/") < 0)
-    {
-        throw Exception(ex_type::FORK_FAILED);
-    }
+        if (chdir("/") < 0)
+        {
+            throw Exception(ex_type::FORK_FAILED);
+        }
 
-    std::freopen("/dev/null", "r", stdin);
-    std::freopen("/dev/null", "w", stdout);
-    std::freopen("/dev/null", "w", stderr);
+        std::freopen("/dev/null", "r", stdin);
+        std::freopen("/dev/null", "w", stdout);
+        std::freopen("/dev/null", "w", stderr);
+    }
 
     writePidFile();
 }
