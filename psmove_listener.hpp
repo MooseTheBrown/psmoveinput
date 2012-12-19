@@ -39,19 +39,12 @@ typedef boost::signals2::signal<void (int, ControllerId)> button_signal;
 class PSMoveListener
 {
 public:
-// default timeout values (ms)
-// TODO: make configurable
-#define DEFAULT_POLL_TIMEOUT    20
-#define DEFAULT_CONN_TIMEOUT    3000
-// controller disconnect timeout (s)
-#define DISCONNECT_TIMEOUT      7
-// LED update timeout (ms)
-#define LED_TIMEOUT             4000
-
     PSMoveListener(Log &log,
                    OpMode mode,
-                   int pollTimeout = DEFAULT_POLL_TIMEOUT,
-                   int connectTimeout = DEFAULT_CONN_TIMEOUT);
+                   int pollTimeout,
+                   int connectTimeout,
+                   int disconnectTimeout,
+                   int ledTimeout);
     virtual ~PSMoveListener();
 
     gyro_signal &getGyroSignal() { return gyroSignal_; }
@@ -75,7 +68,9 @@ protected:
                    int psmoveId,
                    PSMove *move,
                    PSMoveListener *listener,
-                   int pollTimeout);
+                   int pollTimeout,
+                   int disconnectTimeout,
+                   int ledTimeout);
         void join() { if (thread_ != nullptr) thread_->join(); }
         bool running();
         void operator ()();
@@ -88,6 +83,8 @@ protected:
         boost::thread *thread_;
         Log &log_;
         int pollTimeout_;
+        int disconnectTimeout_;
+        int ledTimeout_;
         int buttons_;
         timespec lastTp_;
         int pollCount_;
@@ -100,13 +97,15 @@ protected:
     gyro_signal gyroSignal_;
     button_signal buttonSignal_;
     Log &log_;
-    int pollTimeout_;
-    int connectTimeout_;
     bool stop_;
     OpMode mode_;
     ControllerThread *controllerThreads_[MAX_CONTROLLERS];
     boost::mutex mutex_;
     bool threadStop_;
+    int pollTimeout_;
+    int connectTimeout_;
+    int disconnectTimeout_;
+    int ledTimeout_;
 
     void init();
     bool checkMoved();

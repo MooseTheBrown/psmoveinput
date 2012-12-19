@@ -130,6 +130,15 @@ TEST(ConfigTest, CorrectConfig)
     // check operation mode
     ASSERT_EQ(psmoveinput::OpMode::CLIENT, config.getOpMode());
 
+    // check timeouts
+    ASSERT_EQ(100, config.getPollTimeout());
+    ASSERT_EQ(500, config.getConnTimeout());
+    ASSERT_EQ(20, config.getDisconnectTimeout());
+    ASSERT_EQ(1000, config.getLedTimeout());
+
+    // check move threshold
+    ASSERT_EQ(3, config.getMoveThreshold());
+
     // check key maps
     psmoveinput::key_map keymap1 = config.getKeyMap(psmoveinput::ControllerId::FIRST);
     ASSERT_EQ(3, keymap1.size());

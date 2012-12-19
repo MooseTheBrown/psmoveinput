@@ -53,6 +53,15 @@ public:
     LogLevel getLogLevel() { return loglevel_; }
     // get operation mode
     OpMode getOpMode() { return opmode_; }
+    // get fork mode
+    bool getForeground() { return foreground_; }
+    // timeout getters
+    int getPollTimeout() { return pollTimeout_; }
+    int getConnTimeout() { return connTimeout_; }
+    int getDisconnectTimeout() { return disconnectTimeout_; }
+    int getLedTimeout() { return ledTimeout_; }
+    // get move threshold
+    int getMoveThreshold() { return moveThreshold_; }
 
     // parsing status
     bool isOK() { return ok_; }
@@ -62,8 +71,6 @@ public:
     bool versionRequested() { return version_; }
     // get error message; meaningful only in case isOK() returns false
     std::string error() { return error_; }
-    // get fork mode
-    bool getForeground() { return foreground_; }
 
 protected:
     boost::program_options::variables_map opts_;
@@ -86,6 +93,11 @@ protected:
     OpMode opmode_;
     bool opmode_set_;
     bool foreground_;
+    int pollTimeout_;
+    int connTimeout_;
+    int disconnectTimeout_;
+    int ledTimeout_;
+    int moveThreshold_;
     
     void handleCmdLine();
     void getLogFromChar(char l);

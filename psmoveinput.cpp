@@ -319,7 +319,7 @@ void PSMoveInput::initHandler()
     handler_ = new PSMoveHandler(config_.getKeyMap(ControllerId::FIRST),
                                  config_.getKeyMap(ControllerId::SECOND),
                                  config_.getMoveCoeffs(),
-                                 2,   // TODO: make configurable
+                                 config_.getMoveThreshold(),
                                  *log_);
 
     // connect handler signals to device slots
@@ -332,7 +332,12 @@ void PSMoveInput::initHandler()
 
 void PSMoveInput::startListener()
 {
-    listener_ = new PSMoveListener(*log_, config_.getOpMode());
+    listener_ = new PSMoveListener(*log_,
+                                   config_.getOpMode(),
+                                   config_.getPollTimeout(),
+                                   config_.getConnTimeout(),
+                                   config_.getDisconnectTimeout(),
+                                   config_.getLedTimeout());
 
     // connect listener signals to handler slots
     gyro_signal &gyroSignal = listener_->getGyroSignal();

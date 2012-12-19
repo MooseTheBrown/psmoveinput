@@ -44,7 +44,12 @@ Config::Config() :
     config_file_set_(false),
     opmode_(OpMode::STANDALONE),
     opmode_set_(false),
-    foreground_(false)
+    foreground_(false),
+    pollTimeout_(DEF_POLL_TIMEOUT),
+    connTimeout_(DEF_CONN_TIMEOUT),
+    disconnectTimeout_(DEF_DISCONNECT_TIMEOUT),
+    ledTimeout_(DEF_LED_UPDATE_TIMEOUT),
+    moveThreshold_(DEF_MOVE_THRESHOLD)
 {
     // command line options description
     optdesc_.add_options()
@@ -80,7 +85,12 @@ Config::Config() :
         (OPT_PSBTN_1_PS, po::value<std::string>())
         (OPT_PSBTN_1_MOVE, po::value<std::string>())
         (OPT_PSBTN_1_T, po::value<std::string>())
-        (OPT_CONF_MODE, po::value<std::string>());
+        (OPT_CONF_MODE, po::value<std::string>())
+        (OPT_CONF_POLL_TIMEOUT, po::value<int>())
+        (OPT_CONF_CONN_TIMEOUT, po::value<int>())
+        (OPT_CONF_DISCONNECT_TIMEOUT, po::value<int>())
+        (OPT_CONF_LED_UPDATE_TIMEOUT, po::value<int>())
+        (OPT_CONF_MOVE_THRESHOLD, po::value<int>());
 }
 
 Config::~Config()
@@ -228,6 +238,28 @@ void Config::parseConfig()
         {
             getModeFromString(conf_opts_[OPT_CONF_MODE].as<std::string>());
         }
+        // store timeouts
+        if (conf_opts_.count(OPT_CONF_POLL_TIMEOUT))
+        {
+            pollTimeout_= conf_opts_[OPT_CONF_POLL_TIMEOUT].as<int>();
+        }
+        if (conf_opts_.count(OPT_CONF_CONN_TIMEOUT))
+        {
+            connTimeout_= conf_opts_[OPT_CONF_CONN_TIMEOUT].as<int>();
+        }
+        if (conf_opts_.count(OPT_CONF_DISCONNECT_TIMEOUT))
+        {
+            disconnectTimeout_= conf_opts_[OPT_CONF_DISCONNECT_TIMEOUT].as<int>();
+        }
+        if (conf_opts_.count(OPT_CONF_LED_UPDATE_TIMEOUT))
+        {
+            ledTimeout_= conf_opts_[OPT_CONF_LED_UPDATE_TIMEOUT].as<int>();
+        }
+        // store move threshold
+        if (conf_opts_.count(OPT_CONF_MOVE_THRESHOLD))
+        {
+            moveThreshold_= conf_opts_[OPT_CONF_MOVE_THRESHOLD].as<int>();
+        }
 
         // add key map entries one by one
         const std::vector<boost::shared_ptr<po::option_description>> &opts = configdesc_.options();
@@ -239,6 +271,11 @@ void Config::parseConfig()
                  (longname != OPT_MOVEC_X) &&
                  (longname != OPT_MOVEC_Y) &&
                  (longname != OPT_CONF_MODE) &&
+                 (longname != OPT_CONF_POLL_TIMEOUT) &&
+                 (longname != OPT_CONF_CONN_TIMEOUT) &&
+                 (longname != OPT_CONF_DISCONNECT_TIMEOUT) &&
+                 (longname != OPT_CONF_LED_UPDATE_TIMEOUT) &&
+                 (longname != OPT_CONF_MOVE_THRESHOLD) &&
                  conf_opts_.count(longname) )
             {
                 KeyMapEntry entry;

@@ -31,13 +31,17 @@ namespace psmoveinput
 PSMoveListener::PSMoveListener(Log &log,
                                OpMode mode,
                                int pollTimeout,
-                               int connectTimeout) :
+                               int connectTimeout,
+                               int disconnectTimeout,
+                               int ledTimeout) :
     log_(log),
-    pollTimeout_(pollTimeout),
-    connectTimeout_(connectTimeout),
     stop_(false),
     mode_(mode),
-    threadStop_(false)
+    threadStop_(false),
+    pollTimeout_(pollTimeout),
+    connectTimeout_(connectTimeout),
+    disconnectTimeout_(disconnectTimeout),
+    ledTimeout_(ledTimeout)
 {
     for (int i = 0; i < MAX_CONTROLLERS; i++)
     {
@@ -169,11 +173,13 @@ void PSMoveListener::handleNewDevice(int psmoveId, PSMove *move)
 {
     if (controllerThreads_[0]->running() == false)
     {
-        controllerThreads_[0]->start(ControllerId::FIRST, psmoveId, move, this, pollTimeout_);
+        controllerThreads_[0]->start(ControllerId::FIRST, psmoveId, move, this,
+                                     pollTimeout_, disconnectTimeout_, ledTimeout_);
     }
     else if (controllerThreads_[1]->running() == false)
     {
-        controllerThreads_[1]->start(ControllerId::SECOND, psmoveId, move, this, pollTimeout_);
+        controllerThreads_[1]->start(ControllerId::SECOND, psmoveId, move, this,
+                                     pollTimeout_, disconnectTimeout_, ledTimeout_);
     }
 }
 
@@ -243,7 +249,9 @@ PSMoveListener::ControllerThread::ControllerThread(Log &log) :
     listener_(nullptr),
     thread_(nullptr),
     log_(log),
-    pollTimeout_(DEFAULT_POLL_TIMEOUT),
+    pollTimeout_(0),
+    disconnectTimeout_(0),
+    ledTimeout_(0),
     buttons_(0),
     pollCount_(0),
     psmoveId_(0)
@@ -264,7 +272,9 @@ void PSMoveListener::ControllerThread::start(ControllerId id,
                                              int psmoveId,
                                              PSMove *move,
                                              PSMoveListener *listener,
-                                             int pollTimeout)
+                                             int pollTimeout,
+                                             int disconnectTimeout,
+                                             int ledTimeout)
 {
     // only start new thread if there isn't one already running
     if (thread_ == nullptr)
@@ -276,6 +286,8 @@ void PSMoveListener::ControllerThread::start(ControllerId id,
         move_ = move;
         listener_ = listener;
         pollTimeout_ = pollTimeout;
+        disconnectTimeout_ = disconnectTimeout;
+        ledTimeout_ = ledTimeout;
         thread_ = new boost::thread(boost::ref(*this));
     }
 }
@@ -335,7 +347,7 @@ void PSMoveListener::ControllerThread::operator ()()
         clock_gettime(CLOCK_MONOTONIC_RAW, &tp);
         if (lastTp_.tv_sec != 0)
         {
-            if ((tp.tv_sec - lastTp_.tv_sec) > DISCONNECT_TIMEOUT)
+            if ((tp.tv_sec - lastTp_.tv_sec) > disconnectTimeout_)
             {
                 break;
             }
@@ -365,7 +377,7 @@ void PSMoveListener::ControllerThread::operator ()()
 
 void PSMoveListener::ControllerThread::setLeds()
 {
-    if (move_ == nullptr )
+    if (move_ == nullptr)
     {
         return;
     }
@@ -386,7 +398,7 @@ void PSMoveListener::ControllerThread::setLeds()
 void PSMoveListener::ControllerThread::updateLeds()
 {
     pollCount_++;
-    if (pollCount_ > (LED_TIMEOUT / pollTimeout_))
+    if (pollCount_ > (ledTimeout_ / pollTimeout_))
     {
         pollCount_ = 0;
         psmove_update_leds(move_);

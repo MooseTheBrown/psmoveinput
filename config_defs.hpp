@@ -76,6 +76,11 @@ namespace psmoveinput
 #define OPT_PSBTN_1_MOVE "PSBTN_1_MOVE"
 #define OPT_PSBTN_1_T "PSBTN_1_T"
 #define OPT_CONF_MODE "MODE"
+#define OPT_CONF_POLL_TIMEOUT "POLL_TIMEOUT"
+#define OPT_CONF_CONN_TIMEOUT "CONN_TIMEOUT"
+#define OPT_CONF_DISCONNECT_TIMEOUT "DISCONNECT_TIMEOUT"
+#define OPT_CONF_LED_UPDATE_TIMEOUT "LED_UPDATE_TIMEOUT"
+#define OPT_CONF_MOVE_THRESHOLD "MOVE_THRESHOLD"
 
 // operation modes
 #define OPT_MODE_STANDALONE "standalone"
@@ -88,6 +93,11 @@ namespace psmoveinput
 #define DEF_MOVEC_X 1.0
 #define DEF_MOVEC_Y 1.0
 #define DEF_MODE    OPT_MODE_STANDALONE
+#define DEF_POLL_TIMEOUT 20 // ms
+#define DEF_CONN_TIMEOUT 3000 // ms
+#define DEF_DISCONNECT_TIMEOUT 7 // s
+#define DEF_LED_UPDATE_TIMEOUT 4000 // ms
+#define DEF_MOVE_THRESHOLD 0
 
 } // namespace psmoveinput
 
