@@ -35,17 +35,20 @@ public:
         dx_(0),
         dy_(0),
         code_(0),
-        pressed_(false)
+        pressed_(false),
+        disconnect_(false)
     {
     }
     virtual ~TestListener() {}
     void onMove(int dx, int dy) { dx_ = dx; dy_ = dy; }
     void onKey(int code, bool pressed) { code_ = code; pressed_ = pressed; }
+    void onDisconnect() { disconnect_ = true; }
 
     int dx_;
     int dy_;
     int code_;
     bool pressed_;
+    bool disconnect_;
 };
 
 class PSMoveHandlerTest : public testing::Test
@@ -55,7 +58,9 @@ public:
     {
         dummyLog_ = new psmoveinput::Log(psmoveinput::LogParams("dummylog",
                                                                 psmoveinput::LogLevel::INFO));
-        psmoveinput::key_map keymap1{{Btn_CROSS, KEY_X}, {Btn_START, KEY_ENTER}};
+        psmoveinput::key_map keymap1{{Btn_CROSS, KEY_X},
+                                     {Btn_START, KEY_ENTER},
+                                     {Btn_TRIANGLE, KEY_PSMOVE_DISCONNECT}};
         psmoveinput::key_map keymap2{{Btn_CROSS, KEY_SPACE}, {Btn_START, KEY_DOWN}};
         psmoveinput::MoveCoeffs coeffs{0.5, 2.0};
         handler_ = new psmoveinput::PSMoveHandler(keymap1, keymap2, coeffs, 100, *dummyLog_);
@@ -65,6 +70,8 @@ public:
         handler_->getKeySignal().connect(boost::bind(&TestListener::onKey,
                                                      &listener_,
                                                      _1, _2));
+        handler_->getDisconnectSignal().connect(boost::bind(&TestListener::onDisconnect,
+                                                            &listener_));
     }
 
     virtual void TearDown()
@@ -145,6 +152,10 @@ TEST_F(PSMoveHandlerTest, CorrectButtons)
     handler_->onButtons(0, psmoveinput::ControllerId::SECOND);
     ASSERT_EQ(KEY_DOWN, listener_.code_);
     ASSERT_EQ(false, listener_.pressed_);
+
+    // disconnect button
+    handler_->onButtons(Btn_TRIANGLE, psmoveinput::ControllerId::FIRST);
+    ASSERT_EQ(true, listener_.disconnect_);
 }
 
 TEST_F(PSMoveHandlerTest, IncorrectButtons)

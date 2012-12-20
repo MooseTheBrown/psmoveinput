@@ -25,7 +25,7 @@
 
 #include "common.hpp"
 #include "log.hpp"
-#include <linux/input.h>
+#include "config_defs.hpp"
 #include <psmoveapi/psmove.h>
 #include <boost/signals2.hpp>
 #include <boost/thread/mutex.hpp>
@@ -37,6 +37,7 @@ namespace psmoveinput
 
 typedef boost::signals2::signal<void (int, int)> move_signal;
 typedef boost::signals2::signal<void (int, bool)> key_signal;
+typedef boost::signals2::signal<void ()> disconnect_signal;
 
 class PSMoveHandler
 {
@@ -53,10 +54,12 @@ public:
 
     move_signal &getMoveSignal() { return move_signal_; }
     key_signal &getKeySignal() { return key_signal_; }
+    disconnect_signal &getDisconnectSignal() { return disconnect_signal_; }
 
 protected:
     move_signal move_signal_;
     key_signal key_signal_;
+    disconnect_signal disconnect_signal_;
     key_map keymaps_[MAX_CONTROLLERS];
     MoveCoeffs coeffs_;
     int buttons_[MAX_CONTROLLERS];
@@ -66,6 +69,7 @@ protected:
     boost::mutex mutex_;
 
     void reportKey(int button, bool pressed, ControllerId controller);
+    bool handleSpecialKeys(int lincode);
 };
 
 } // namespace psmoveinput

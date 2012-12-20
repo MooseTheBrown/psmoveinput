@@ -149,9 +149,27 @@ void PSMoveHandler::reportKey(int button, bool pressed, ControllerId controller)
     {
         if (entry.pscode == button)
         {
-            key_signal_(entry.lincode, pressed);
+            if (handleSpecialKeys(entry.lincode) == false)
+            {
+                // this is not a special key handled internally, so
+                // pass it further
+                key_signal_(entry.lincode, pressed);
+            }
         }
     }
+}
+
+bool PSMoveHandler::handleSpecialKeys(int lincode)
+{
+    bool ret = false;
+
+    if (lincode == KEY_PSMOVE_DISCONNECT)
+    {
+        disconnect_signal_();
+        ret = true;
+    }
+
+    return ret;
 }
 
 } // namespace psmoveinput

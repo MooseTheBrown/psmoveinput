@@ -23,6 +23,8 @@
 #ifndef PSMOVEINPUT_CONFIG_DEFS_HPP
 #define PSMOVEINPUT_CONFIG_DEFS_HPP
 
+#include <linux/input.h>
+
 namespace psmoveinput
 {
 
@@ -85,6 +87,9 @@ namespace psmoveinput
 // operation modes
 #define OPT_MODE_STANDALONE "standalone"
 #define OPT_MODE_CLIENT     "client"
+
+// special buttons handled by psmoveinput itself
+#define KEY_PSMOVE_DISCONNECT KEY_MAX + 1
 
 // defaults
 #define DEF_PIDFILE "/var/run/psmoveinput.pid"
