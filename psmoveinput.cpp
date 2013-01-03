@@ -346,6 +346,10 @@ void PSMoveInput::startListener()
     gyroSignal.connect(boost::bind(&PSMoveHandler::onGyroscope, handler_, _1, _2));
     buttonSignal.connect(boost::bind(&PSMoveHandler::onButtons, handler_, _1, _2));
 
+    // connect handler's disconnect signal to listener's slot
+    disconnect_signal &disconnectSignal = handler_->getDisconnectSignal();
+    disconnectSignal.connect(boost::bind(&PSMoveListener::onDisconnectKey, listener_, _1));
+
     listener_->run();
 }
 

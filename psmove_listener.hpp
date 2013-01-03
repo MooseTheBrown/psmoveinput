@@ -53,6 +53,7 @@ public:
     void stop();
     bool needToStop() { return (stop_ || threadStop_); }
     void onDisconnect();
+    void onDisconnectKey(ControllerId id);
 
 protected:
 
@@ -75,6 +76,7 @@ protected:
         bool running();
         void operator ()();
         int getPSMoveId() { return psmoveId_; }
+        std::string getBtaddr() { return btaddr_; }
 
     protected:
         ControllerId id_;
@@ -89,6 +91,7 @@ protected:
         timespec lastTp_;
         int pollCount_;
         int psmoveId_;
+        std::string btaddr_;
 
         void setLeds();
         void updateLeds();

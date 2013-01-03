@@ -60,6 +60,7 @@ target_link_libraries (psmoveinput ${COMMON_LINK_LIBS})
 # installation
 install (TARGETS psmoveinput DESTINATION bin)
 install (FILES config/psmoveinput.conf DESTINATION /etc)
+install (FILES util/psmoveinput_disconnect.py DESTINATION bin)
 
 # unit test
 if (BUILD_UNIT_TESTS)

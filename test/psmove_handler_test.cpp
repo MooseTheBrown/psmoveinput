@@ -42,13 +42,14 @@ public:
     virtual ~TestListener() {}
     void onMove(int dx, int dy) { dx_ = dx; dy_ = dy; }
     void onKey(int code, bool pressed) { code_ = code; pressed_ = pressed; }
-    void onDisconnect() { disconnect_ = true; }
+    void onDisconnect(psmoveinput::ControllerId id) { disconnect_ = true; id_ = id; }
 
     int dx_;
     int dy_;
     int code_;
     bool pressed_;
     bool disconnect_;
+    psmoveinput::ControllerId id_;
 };
 
 class PSMoveHandlerTest : public testing::Test
@@ -71,7 +72,7 @@ public:
                                                      &listener_,
                                                      _1, _2));
         handler_->getDisconnectSignal().connect(boost::bind(&TestListener::onDisconnect,
-                                                            &listener_));
+                                                            &listener_, _1));
     }
 
     virtual void TearDown()
@@ -156,6 +157,7 @@ TEST_F(PSMoveHandlerTest, CorrectButtons)
     // disconnect button
     handler_->onButtons(Btn_TRIANGLE, psmoveinput::ControllerId::FIRST);
     ASSERT_EQ(true, listener_.disconnect_);
+    ASSERT_EQ(psmoveinput::ControllerId::FIRST, listener_.id_);
 }
 
 TEST_F(PSMoveHandlerTest, IncorrectButtons)

@@ -149,7 +149,7 @@ void PSMoveHandler::reportKey(int button, bool pressed, ControllerId controller)
     {
         if (entry.pscode == button)
         {
-            if (handleSpecialKeys(entry.lincode) == false)
+            if (handleSpecialKeys(entry.lincode, controller) == false)
             {
                 // this is not a special key handled internally, so
                 // pass it further
@@ -159,13 +159,13 @@ void PSMoveHandler::reportKey(int button, bool pressed, ControllerId controller)
     }
 }
 
-bool PSMoveHandler::handleSpecialKeys(int lincode)
+bool PSMoveHandler::handleSpecialKeys(int lincode, ControllerId controller)
 {
     bool ret = false;
 
     if (lincode == KEY_PSMOVE_DISCONNECT)
     {
-        disconnect_signal_();
+        disconnect_signal_(controller);
         ret = true;
     }
 

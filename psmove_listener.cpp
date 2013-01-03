@@ -194,6 +194,29 @@ void PSMoveListener::onDisconnect()
     // re-created on next main listener loop iteration
 }
 
+void PSMoveListener::onDisconnectKey(ControllerId id)
+{
+    std::string btaddr;
+
+    if (id == ControllerId::FIRST)
+    {
+        btaddr = controllerThreads_[0]->getBtaddr();
+    }
+    else
+    {
+        btaddr = controllerThreads_[1]->getBtaddr();
+    }
+
+    log_.write(boost::str(boost::format("PSMoveListener: disconnecting controller btaddr=%1%") % btaddr.c_str()).c_str());
+    // call psmoveinput_disconnect giving it controller's Bluetooth address
+    std::string cmd = "psmoveinput_disconnect.py ";
+    cmd += btaddr;
+    system(cmd.c_str());
+
+    // controller thread will detect disconnect automatically, so there's
+    // no need to do anything else here
+}
+
 PSMove *PSMoveListener::connect(int &psmoveId)
 {
     // find correct psmoveapi id of controller to connect
@@ -288,6 +311,7 @@ void PSMoveListener::ControllerThread::start(ControllerId id,
         pollTimeout_ = pollTimeout;
         disconnectTimeout_ = disconnectTimeout;
         ledTimeout_ = ledTimeout;
+        btaddr_ = psmove_get_serial(move_);
         thread_ = new boost::thread(boost::ref(*this));
     }
 }

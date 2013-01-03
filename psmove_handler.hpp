@@ -37,7 +37,7 @@ namespace psmoveinput
 
 typedef boost::signals2::signal<void (int, int)> move_signal;
 typedef boost::signals2::signal<void (int, bool)> key_signal;
-typedef boost::signals2::signal<void ()> disconnect_signal;
+typedef boost::signals2::signal<void (ControllerId)> disconnect_signal;
 
 class PSMoveHandler
 {
@@ -69,7 +69,7 @@ protected:
     boost::mutex mutex_;
 
     void reportKey(int button, bool pressed, ControllerId controller);
-    bool handleSpecialKeys(int lincode);
+    bool handleSpecialKeys(int lincode, ControllerId controller);
 };
 
 } // namespace psmoveinput
