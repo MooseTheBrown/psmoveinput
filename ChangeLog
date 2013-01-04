@@ -1,0 +1,19 @@
+0.2
+-------------------------------------------------------------------------------
+* New "Operation mode" configuration option. psmoveinput can run as a moved
+  client as well as in standalone mode
+
+* Added support of two simultaneously connected controllers. Each can have its
+  own key map, but only the first controller moves the mouse pointer.
+
+* New foreground mode added to facilitate debugging. psmoveinput will not fork
+  to background when started in this mode.
+
+* Connection and polling timeouts are made configurable.
+
+* Move threshold value is made configurable.
+
+* Calibrated gyroscope readings handling is added.
+
+* Special "disconnect" button is added. Any PSMove key can be mapped to
+  this button. Pressing corresponding key causes controller to be disconnected.

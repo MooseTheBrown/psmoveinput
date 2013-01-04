@@ -39,7 +39,7 @@ set (COMMON_LINK_LIBS psmoveapi
 include_directories (${psmoveinput_SOURCE_DIR})
 
 set (PSMOVEINPUT_VERSION_MAJOR "0")
-set (PSMOVEINPUT_VERSION_MINOR "1")
+set (PSMOVEINPUT_VERSION_MINOR "2")
 set (PSMOVEINPUT_VERSION_PATCH "0")
 configure_file (${psmoveinput_SOURCE_DIR}/config.h.in
                 ${psmoveinput_SOURCE_DIR}/config.h)

@@ -5,9 +5,9 @@ Pre-requisites
    psmoveapi provides a couple of useful executable files that are required to
    connect PSMove controller to PC via Bluetooth. psmovepair is installed into
    <install_prefix>/bin directory, and should be present in PATH after psmoveapi
-   is installed. bluez-register-psmove is a script located in <psmoveapi_src_dir>/contrib/
+   is installed. create_move.py is located in <psmoveapi_src_dir>/contrib/
    directory. You may want to copy it manually to the same location where psmovepair
-   is installed to be able to run it later by just typing "bluez-register-psmove".
+   is installed to be able to run it later by just typing "create_move.py".
 
 2. Boost libraries. At least boost-thread and boost-program-options have to be installed.
    You will also need boost development headers (usually tha package is called boost-devel).
@@ -23,7 +23,7 @@ Pre-requisites
 
 Getting the sources
 -------------------------------------------------------------------------------
-git clone https://github.com/MooseTheBrown/psmoveinput.gi
+git clone https://github.com/MooseTheBrown/psmoveinput.git
 
 Building the source
 -------------------------------------------------------------------------------

@@ -1,4 +1,4 @@
-psmoveinput 0.1.0
+psmoveinput 0.2.0
 
 Description
 -------------------------------------------------------------------------------
@@ -17,6 +17,7 @@ psmoveinput requires the following software to be installed:
 - bluez
 - boost-thread
 - boost-program-options
+- python (recent versions of both branches 2 and 3 should work fine)
 
 bluez and boost libraries should be present in most distributions' repos.
 psmoveapi should be compiled and installed from source.
@@ -42,7 +43,7 @@ Connecting PSMove controller
 2. Run "psmovepair" as root. Notice controller's Bluetooth address. psmovepair
    is part of psmoveapi (see INSTALL for details).
 3. Disconnect the controller.
-4. Run "bluez-register-psmove <controller_BT_addr>" as root. bluez-register-psmove
+4. Run "create_move.py <controller_BT_addr>" as root. create_move.py
    is part of psmoveapi (see INSTALL for details).
 5. Restart bluetoothd.
 6. Press the PS button on the PSMove controller. You may see popup indicating
@@ -61,3 +62,7 @@ License
 GNU GPLv3 or any later version (see COPYING).
 Google Test Framework provided with psmoveinput is covered by its own license,
 see gtest-1.6.0/COPYING for details.
+
+Credits
+-------------------------------------------------------------------------------
+Thanks to Thomas Perl and all who contributed to psmoveapi library.
