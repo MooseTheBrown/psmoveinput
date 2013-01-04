@@ -126,7 +126,7 @@ int PSMoveInput::run(int argc, char **argv)
     {
         if (log_)
         {
-            log_->write(e.what(), LogLevel::ERROR);
+            log_->write(e.what(), LogLevel::FATAL);
         }
         retval = RETVAL_FAIL;
     }

@@ -28,6 +28,8 @@
 namespace psmoveinput
 {
 
+#define CALIBRATED_GYRO_COEFF   10
+
 PSMoveListener::PSMoveListener(Log &log,
                                OpMode mode,
                                int pollTimeout,
@@ -277,7 +279,8 @@ PSMoveListener::ControllerThread::ControllerThread(Log &log) :
     ledTimeout_(0),
     buttons_(0),
     pollCount_(0),
-    psmoveId_(0)
+    psmoveId_(0),
+    calibrated_(false)
 {
     lastTp_.tv_sec = 0;
     lastTp_.tv_nsec = 0;
@@ -312,6 +315,15 @@ void PSMoveListener::ControllerThread::start(ControllerId id,
         disconnectTimeout_ = disconnectTimeout;
         ledTimeout_ = ledTimeout;
         btaddr_ = psmove_get_serial(move_);
+        if (psmove_has_calibration(move_) == PSMove_True)
+        {
+            calibrated_ = true;
+        }
+        else
+        {
+            calibrated_ = false;
+        }
+
         thread_ = new boost::thread(boost::ref(*this));
     }
 }
@@ -351,7 +363,21 @@ void PSMoveListener::ControllerThread::operator ()()
             // only the first controller moves the mouse pointer
             if (id_ == ControllerId::FIRST)
             {
-                psmove_get_gyroscope(move_, &gx, &gy, &gz);
+                if (calibrated_ == true)
+                {
+                    float fx, fy, fz;
+                    psmove_get_gyroscope_frame(move_, Frame_SecondHalf, &fx, &fy, &fz);
+                    /* since calibrated gyroscope values can be less than 1, e.g. something
+                       like 0.00354, we multiply them by special coefficient before converting
+                       them to integers in order not to miss small controller movements
+                       and prevent the mouse cursor from being twitchy */
+                    gx = static_cast<int>(fx * CALIBRATED_GYRO_COEFF);
+                    gz = static_cast<int>(fz * CALIBRATED_GYRO_COEFF);
+                }
+                else
+                {
+                    psmove_get_gyroscope(move_, &gx, &gy, &gz);
+                }
                 listener_->getGyroSignal()(-gz, -gx);
             }
 

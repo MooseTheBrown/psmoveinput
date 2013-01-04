@@ -92,6 +92,7 @@ protected:
         int pollCount_;
         int psmoveId_;
         std::string btaddr_;
+        bool calibrated_;
 
         void setLeds();
         void updateLeds();
