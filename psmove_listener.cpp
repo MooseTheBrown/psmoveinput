@@ -245,6 +245,12 @@ PSMove *PSMoveListener::connect(int &psmoveId)
 
     PSMove *move = nullptr;
     move = psmove_connect_by_id(psmoveId);
+    if (psmove_connection_type(move) != Conn_Bluetooth)
+    {
+        // ignore controllers connected via USB
+        psmove_disconnect(move);
+        move = nullptr;
+    }
     return move;
 }
 
