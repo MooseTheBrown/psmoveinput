@@ -209,23 +209,24 @@ void PSMoveListener::onDisconnectKey(ControllerId id)
         btaddr = controllerThreads_[1]->getBtaddr();
     }
 
+    // stop controller threads
+    onDisconnect();
+
     log_.write(boost::str(boost::format("PSMoveListener: disconnecting controller btaddr=%1%") % btaddr.c_str()).c_str());
     // call psmoveinput_disconnect giving it controller's Bluetooth address
     std::string cmd = "psmoveinput_disconnect.py ";
     cmd += btaddr;
     system(cmd.c_str());
-
-    // controller thread will detect disconnect automatically, so there's
-    // no need to do anything else here
 }
 
 PSMove *PSMoveListener::connect(int &psmoveId)
 {
+    bool exists = false;
+
     // find correct psmoveapi id of controller to connect
     for (psmoveId = 0; psmoveId < MAX_CONTROLLERS; psmoveId++)
     {
         // check if there is a running controller thread with this id
-        bool exists = false;
         for (int i = 0; i < MAX_CONTROLLERS; i++)
         {
             if ((controllerThreads_[i]->running() == true) &&
@@ -244,12 +245,16 @@ PSMove *PSMoveListener::connect(int &psmoveId)
     }
 
     PSMove *move = nullptr;
-    move = psmove_connect_by_id(psmoveId);
-    if (psmove_connection_type(move) != Conn_Bluetooth)
+
+    if (exists == false)
     {
-        // ignore controllers connected via USB
-        psmove_disconnect(move);
-        move = nullptr;
+        move = psmove_connect_by_id(psmoveId);
+        if (psmove_connection_type(move) != Conn_Bluetooth)
+        {
+            // ignore controllers connected via USB
+            psmove_disconnect(move);
+            move = nullptr;
+        }
     }
     return move;
 }
@@ -396,6 +401,8 @@ void PSMoveListener::ControllerThread::operator ()()
 
             // remember when we received last piece of data from PSMove
             clock_gettime(CLOCK_MONOTONIC_RAW, &lastTp_);
+
+            updateLeds();
         }
 
         // if controller does not give data updates for a specific period
@@ -408,8 +415,6 @@ void PSMoveListener::ControllerThread::operator ()()
                 break;
             }
         }
-
-        updateLeds();
         
         boost::this_thread::sleep(boost::posix_time::millisec(pollTimeout_));
     }
