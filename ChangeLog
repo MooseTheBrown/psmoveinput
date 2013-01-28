@@ -1,3 +1,10 @@
+0.2.1
+-------------------------------------------------------------------------------
+* Ignoring controllers connected via USB
+
+* Fixed intermittent failure to re-connect controller after it has been
+  disconnected using special "disconnect" key.
+
 0.2
 -------------------------------------------------------------------------------
 * New "Operation mode" configuration option. psmoveinput can run as a moved
