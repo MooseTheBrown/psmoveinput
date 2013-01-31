@@ -58,9 +58,12 @@ add_executable (psmoveinput ${PSMOVEINPUT_SRC})
 target_link_libraries (psmoveinput ${COMMON_LINK_LIBS})
 
 # installation
+set (PSMOVEINPUT_BINARY_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
+                                    GROUP_READ GROUP_WRITE GROUP_EXECUTE
+                                    WORLD_READ WORLD_EXECUTE)
 install (TARGETS psmoveinput DESTINATION bin)
 install (FILES config/psmoveinput.conf DESTINATION /etc)
-install (FILES util/psmoveinput_disconnect.py DESTINATION bin)
+install (FILES util/psmoveinput_disconnect.py DESTINATION bin PERMISSIONS ${PSMOVEINPUT_BINARY_PERMISSIONS})
 
 # unit test
 if (BUILD_UNIT_TESTS)
