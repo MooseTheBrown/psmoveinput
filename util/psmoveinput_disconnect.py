@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 # 
-# Copyright (C) 2012 Mikhail Sapozhnikov
+# Copyright (C) 2012, 2013 Mikhail Sapozhnikov
 #
 # This file is part of psmoveinput.
 #

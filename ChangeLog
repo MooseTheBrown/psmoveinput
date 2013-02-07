@@ -1,3 +1,9 @@
+0.2.2
+-------------------------------------------------------------------------------
+* Fixed regression, which broke second controller support
+
+* Added correct install-time permissions for psmoveinput_disconnect.py
+
 0.2.1
 -------------------------------------------------------------------------------
 * Ignoring controllers connected via USB

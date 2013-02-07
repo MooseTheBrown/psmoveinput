@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2012 Mikhail Sapozhnikov
+ * Copyright (C) 2012, 2013 Mikhail Sapozhnikov
  *
  * This file is part of psmoveinput.
  *
@@ -221,11 +221,13 @@ void PSMoveListener::onDisconnectKey(ControllerId id)
 
 PSMove *PSMoveListener::connect(int &psmoveId)
 {
-    bool exists = false;
+    PSMove *move = nullptr;
 
     // find correct psmoveapi id of controller to connect
     for (psmoveId = 0; psmoveId < MAX_CONTROLLERS; psmoveId++)
     {
+        bool exists = false;
+
         // check if there is a running controller thread with this id
         for (int i = 0; i < MAX_CONTROLLERS; i++)
         {
@@ -240,22 +242,18 @@ PSMove *PSMoveListener::connect(int &psmoveId)
         if (exists == false)
         {
             // no thread handles controller with this id, so try to connect to it
+            move = psmove_connect_by_id(psmoveId);
+            if (psmove_connection_type(move) != Conn_Bluetooth)
+            {
+                // ignore controllers connected via USB
+                psmove_disconnect(move);
+                move = nullptr;
+            }
             break;
         }
     }
 
-    PSMove *move = nullptr;
 
-    if (exists == false)
-    {
-        move = psmove_connect_by_id(psmoveId);
-        if (psmove_connection_type(move) != Conn_Bluetooth)
-        {
-            // ignore controllers connected via USB
-            psmove_disconnect(move);
-            move = nullptr;
-        }
-    }
     return move;
 }
 
