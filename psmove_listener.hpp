@@ -112,7 +112,6 @@ protected:
     int ledTimeout_;
 
     void init();
-    bool checkMoved();
     void handleNewDevice(int psmoveId, PSMove *move);
     PSMove *connect(int &psmoveId); 
     bool isFullCapacity();

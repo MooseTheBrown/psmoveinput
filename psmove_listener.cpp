@@ -139,35 +139,11 @@ void PSMoveListener::init()
     // and if it is, then make psmoveapi ignore all hidapi controllers
     if (mode_ == OpMode::CLIENT)
     {
-        if (checkMoved() == true)
-        {
-            psmove_set_remote_config(PSMove_OnlyRemote);
-        }
-        else
-        {
-            // there is no moved, force standalone mode
-            mode_ = OpMode::STANDALONE;
-            psmove_set_remote_config(PSMove_OnlyLocal);
-            log_.write("Launched in client mode, but couldn't find moved", LogLevel::ERROR);
-            log_.write("Forcing standalone mode", LogLevel::ERROR);
-        }
+        psmove_set_remote_config(PSMove_OnlyRemote);
     }
     else
     {
         psmove_set_remote_config(PSMove_OnlyLocal);
-    }
-}
-
-// ugly way to check if moved is running
-bool PSMoveListener::checkMoved()
-{
-    if (system("ps -e | grep moved") == 0)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
     }
 }
 
