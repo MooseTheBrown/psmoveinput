@@ -90,6 +90,7 @@ namespace psmoveinput
 
 // special buttons handled by psmoveinput itself
 #define KEY_PSMOVE_DISCONNECT KEY_MAX + 1
+#define KEY_PSMOVE_MOVE_TRIGGER KEY_MAX + 2
 
 // defaults
 #define DEF_PIDFILE "/var/run/psmoveinput.pid"

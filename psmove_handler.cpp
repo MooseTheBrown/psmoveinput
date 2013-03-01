@@ -32,7 +32,9 @@ PSMoveHandler::PSMoveHandler(const key_map &keymap1,
                              int moveThreshold,
                              Log &log) :
     log_(log),
-    moveThreshold_(moveThreshold)
+    moveThreshold_(moveThreshold),
+    useMoveTrigger_(false),
+    moveTrigger_(false)
 {
     coeffs_.cx = coeffs.cx;
     coeffs_.cy = coeffs.cy;
@@ -42,6 +44,8 @@ PSMoveHandler::PSMoveHandler(const key_map &keymap1,
     
     keymaps_[0] = keymap1;
     keymaps_[1]= keymap2;
+
+    checkTrigger();
 
     buttons_[0] = 0;
     buttons_[1] = 0;
@@ -65,33 +69,39 @@ void PSMoveHandler::onGyroscope(int gx, int gy)
     // previous measurement's timestamp to calculate time delta
     if ((lastGyroTp_.tv_sec != 0) && (lastGyroTp_.tv_nsec != 0))
     {
-        // pointer movement for each axis is calculated by multiplying gyroscope values
-        // we receive from psmove by time delta between current and previous measurements
-        // in milliseconds and then multiplying the result by the coefficient
-        long timeDelta = static_cast<long>((gyroTp.tv_nsec - lastGyroTp_.tv_nsec) / 1000000);
-        if (timeDelta < 0)
+        // if we move trigger is used, then report move only while
+        // move trigger button is pressed
+        if (((useMoveTrigger_ == true) && (moveTrigger_ == true)) ||
+             (useMoveTrigger_ == false))
         {
-            timeDelta += 1000;
-        }
+            // pointer movement for each axis is calculated by multiplying gyroscope values
+            // we receive from psmove by time delta between current and previous measurements
+            // in milliseconds and then multiplying the result by the coefficient
+            long timeDelta = static_cast<long>((gyroTp.tv_nsec - lastGyroTp_.tv_nsec) / 1000000);
+            if (timeDelta < 0)
+            {
+                timeDelta += 1000;
+            }
 
-        log_.write(boost::str(boost::format("timeDelta=%1%") % timeDelta).c_str());
+            log_.write(boost::str(boost::format("timeDelta=%1%") % timeDelta).c_str());
 
-        int dx = static_cast<int>(gx * timeDelta * coeffs_.cx);
-        int dy = static_cast<int>(gy * timeDelta * coeffs_.cy);
-        if (((dx > 0) && (dx < moveThreshold_)) ||
-            ((dx < 0) && (dx > -moveThreshold_)))
-        {
-            dx = 0;
-        }
-        if (((dy > 0) && (dy < moveThreshold_)) ||
-            ((dy < 0) && (dy > -moveThreshold_)))
-        {
-            dy = 0;
-        }
+            int dx = static_cast<int>(gx * timeDelta * coeffs_.cx);
+            int dy = static_cast<int>(gy * timeDelta * coeffs_.cy);
+            if (((dx > 0) && (dx < moveThreshold_)) ||
+                ((dx < 0) && (dx > -moveThreshold_)))
+            {
+                dx = 0;
+            }
+            if (((dy > 0) && (dy < moveThreshold_)) ||
+                ((dy < 0) && (dy > -moveThreshold_)))
+            {
+                dy = 0;
+            }
 
-        if ((dx !=0) || (dy != 0))
-        {
-            move_signal_(dx, dy);
+            if ((dx !=0) || (dy != 0))
+            {
+                move_signal_(dx, dy);
+            }
         }
     }
     
@@ -149,7 +159,7 @@ void PSMoveHandler::reportKey(int button, bool pressed, ControllerId controller)
     {
         if (entry.pscode == button)
         {
-            if (handleSpecialKeys(entry.lincode, controller) == false)
+            if (handleSpecialKeys(entry.lincode, controller, pressed) == false)
             {
                 // this is not a special key handled internally, so
                 // pass it further
@@ -159,7 +169,7 @@ void PSMoveHandler::reportKey(int button, bool pressed, ControllerId controller)
     }
 }
 
-bool PSMoveHandler::handleSpecialKeys(int lincode, ControllerId controller)
+bool PSMoveHandler::handleSpecialKeys(int lincode, ControllerId controller, bool pressed)
 {
     bool ret = false;
 
@@ -168,8 +178,25 @@ bool PSMoveHandler::handleSpecialKeys(int lincode, ControllerId controller)
         disconnect_signal_(controller);
         ret = true;
     }
+    else if((controller == ControllerId::FIRST) && (lincode == KEY_PSMOVE_MOVE_TRIGGER))
+    {
+        moveTrigger_ = pressed;
+        ret = true;
+    }
 
     return ret;
+}
+
+void PSMoveHandler::checkTrigger()
+{
+    for (KeyMapEntry entry : keymaps_[0])
+    {
+        if (entry.lincode == KEY_PSMOVE_MOVE_TRIGGER)
+        {
+            useMoveTrigger_ = true;
+            break;
+        }
+    }
 }
 
 } // namespace psmoveinput

@@ -141,7 +141,7 @@ TEST(ConfigTest, CorrectConfig)
 
     // check key maps
     psmoveinput::key_map keymap1 = config.getKeyMap(psmoveinput::ControllerId::FIRST);
-    ASSERT_EQ(4, keymap1.size());
+    ASSERT_EQ(5, keymap1.size());
     for (psmoveinput::KeyMapEntry entry : keymap1)
     {
         if (entry.pscode == Btn_CROSS)
@@ -159,6 +159,10 @@ TEST(ConfigTest, CorrectConfig)
         else if (entry.pscode == Btn_PS)
         {
             ASSERT_EQ(KEY_PSMOVE_DISCONNECT, entry.lincode);
+        }
+        else if (entry.pscode == Btn_MOVE)
+        {
+            ASSERT_EQ(KEY_PSMOVE_MOVE_TRIGGER, entry.lincode);
         }
         else
         {

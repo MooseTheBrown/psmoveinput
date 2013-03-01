@@ -149,7 +149,8 @@ KeyMapParser::KeyMapParser() :
         std::make_pair("BTN_LEFT", BTN_LEFT),
         std::make_pair("BTN_RIGHT", BTN_RIGHT),
         std::make_pair("BTN_MIDDLE", BTN_MIDDLE),
-        std::make_pair("disconnect", KEY_PSMOVE_DISCONNECT)
+        std::make_pair("disconnect", KEY_PSMOVE_DISCONNECT),
+        std::make_pair("move_trigger", KEY_PSMOVE_MOVE_TRIGGER)
     }
 {
 }

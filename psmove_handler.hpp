@@ -67,9 +67,12 @@ protected:
     int moveThreshold_;
     timespec lastGyroTp_;
     boost::mutex mutex_;
+    bool useMoveTrigger_;
+    bool moveTrigger_;
 
     void reportKey(int button, bool pressed, ControllerId controller);
-    bool handleSpecialKeys(int lincode, ControllerId controller);
+    bool handleSpecialKeys(int lincode, ControllerId controller, bool pressed);
+    void checkTrigger();
 };
 
 } // namespace psmoveinput
