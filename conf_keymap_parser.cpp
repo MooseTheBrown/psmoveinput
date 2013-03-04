@@ -47,7 +47,11 @@ KeyMapParser::KeyMapParser() :
         std::make_pair(OPT_PSBTN_1_START, Btn_START),
         std::make_pair(OPT_PSBTN_1_PS, Btn_PS),
         std::make_pair(OPT_PSBTN_1_MOVE, Btn_MOVE),
-        std::make_pair(OPT_PSBTN_1_T, Btn_T)
+        std::make_pair(OPT_PSBTN_1_T, Btn_T),
+        std::make_pair(OPT_GESTURE_UP, BTN_GESTURE_UP),
+        std::make_pair(OPT_GESTURE_DOWN, BTN_GESTURE_DOWN),
+        std::make_pair(OPT_GESTURE_LEFT, BTN_GESTURE_LEFT),
+        std::make_pair(OPT_GESTURE_RIGHT, BTN_GESTURE_RIGHT)
     },
     linmap_ {
         std::make_pair("KEY_ESC", KEY_ESC),
@@ -150,7 +154,8 @@ KeyMapParser::KeyMapParser() :
         std::make_pair("BTN_RIGHT", BTN_RIGHT),
         std::make_pair("BTN_MIDDLE", BTN_MIDDLE),
         std::make_pair("disconnect", KEY_PSMOVE_DISCONNECT),
-        std::make_pair("move_trigger", KEY_PSMOVE_MOVE_TRIGGER)
+        std::make_pair("move_trigger", KEY_PSMOVE_MOVE_TRIGGER),
+        std::make_pair("gesture_trigger", KEY_PSMOVE_GESTURE_TRIGGER)
     }
 {
 }

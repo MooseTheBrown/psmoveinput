@@ -346,24 +346,31 @@ void PSMoveListener::ControllerThread::operator ()()
         while (psmove_poll(move_))
         {
             // only the first controller moves the mouse pointer
+            if (calibrated_ == true)
+            {
+                float fx, fy, fz;
+                psmove_get_gyroscope_frame(move_, Frame_SecondHalf, &fx, &fy, &fz);
+                /* since calibrated gyroscope values can be less than 1, e.g. something
+                   like 0.00354, we multiply them by special coefficient before converting
+                   them to integers in order not to miss small controller movements
+                   and prevent the mouse cursor from being twitchy */
+                gx = static_cast<int>(fx * CALIBRATED_GYRO_COEFF);
+                gz = static_cast<int>(fz * CALIBRATED_GYRO_COEFF);
+            }
+            else
+            {
+                psmove_get_gyroscope(move_, &gx, &gy, &gz);
+            }
+
             if (id_ == ControllerId::FIRST)
             {
-                if (calibrated_ == true)
-                {
-                    float fx, fy, fz;
-                    psmove_get_gyroscope_frame(move_, Frame_SecondHalf, &fx, &fy, &fz);
-                    /* since calibrated gyroscope values can be less than 1, e.g. something
-                       like 0.00354, we multiply them by special coefficient before converting
-                       them to integers in order not to miss small controller movements
-                       and prevent the mouse cursor from being twitchy */
-                    gx = static_cast<int>(fx * CALIBRATED_GYRO_COEFF);
-                    gz = static_cast<int>(fz * CALIBRATED_GYRO_COEFF);
-                }
-                else
-                {
-                    psmove_get_gyroscope(move_, &gx, &gy, &gz);
-                }
+                // first controller moves the cursor
                 listener_->getGyroSignal()(-gz, -gx);
+            }
+            else
+            {
+                // second controller is used for gestures
+                listener_->getGestureSignal()(-gz, gx);
             }
 
             buttons = psmove_get_buttons(move_);

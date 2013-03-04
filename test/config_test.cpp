@@ -139,6 +139,9 @@ TEST(ConfigTest, CorrectConfig)
     // check move threshold
     ASSERT_EQ(3, config.getMoveThreshold());
 
+    // check gesture threshold
+    ASSERT_EQ(20, config.getGestureThreshold());
+
     // check key maps
     psmoveinput::key_map keymap1 = config.getKeyMap(psmoveinput::ControllerId::FIRST);
     ASSERT_EQ(5, keymap1.size());
@@ -170,7 +173,7 @@ TEST(ConfigTest, CorrectConfig)
         }
     }
     psmoveinput::key_map keymap2 = config.getKeyMap(psmoveinput::ControllerId::SECOND);
-    ASSERT_EQ(3, keymap2.size());
+    ASSERT_EQ(8, keymap2.size());
     for (psmoveinput::KeyMapEntry entry : keymap2)
     {
         if (entry.pscode == Btn_CROSS)
@@ -184,6 +187,26 @@ TEST(ConfigTest, CorrectConfig)
         else if (entry.pscode == Btn_TRIANGLE)
         {
             ASSERT_EQ(KEY_F3, entry.lincode);
+        }
+        else if (entry.pscode == BTN_GESTURE_UP)
+        {
+            ASSERT_EQ(KEY_UP, entry.lincode);
+        }
+        else if (entry.pscode == BTN_GESTURE_DOWN)
+        {
+            ASSERT_EQ(KEY_DOWN, entry.lincode);
+        }
+        else if (entry.pscode == BTN_GESTURE_LEFT)
+        {
+            ASSERT_EQ(KEY_LEFT, entry.lincode);
+        }
+        else if (entry.pscode == BTN_GESTURE_RIGHT)
+        {
+            ASSERT_EQ(KEY_RIGHT, entry.lincode);
+        }
+        else if (entry.pscode == Btn_MOVE)
+        {
+            ASSERT_EQ(KEY_PSMOVE_GESTURE_TRIGGER, entry.lincode);
         }
         else
         {

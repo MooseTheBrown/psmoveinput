@@ -62,6 +62,8 @@ public:
     int getLedTimeout() { return ledTimeout_; }
     // get move threshold
     int getMoveThreshold() { return moveThreshold_; }
+    // get gesture threshold
+    int getGestureThreshold() { return gestureThreshold_; }
 
     // parsing status
     bool isOK() { return ok_; }
@@ -98,6 +100,7 @@ protected:
     int disconnectTimeout_;
     int ledTimeout_;
     int moveThreshold_;
+    int gestureThreshold_;
     
     void handleCmdLine();
     void getLogFromChar(char l);

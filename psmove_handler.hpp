@@ -46,10 +46,12 @@ public:
                   const key_map &keymap2,
                   const MoveCoeffs &coeffs,
                   int moveThreshold,
+                  int gestureThreshold,
                   Log &log);
     virtual ~PSMoveHandler();
 
     void onGyroscope(int gx, int gy);
+    void onGesture(int gx, int gy);
     void onButtons(int buttons, ControllerId controller);
 
     move_signal &getMoveSignal() { return move_signal_; }
@@ -65,14 +67,18 @@ protected:
     int buttons_[MAX_CONTROLLERS];
     Log &log_;
     int moveThreshold_;
+    int gestureThreshold_;
     timespec lastGyroTp_;
+    timespec lastGestureTp_;
     boost::mutex mutex_;
     bool useMoveTrigger_;
     bool moveTrigger_;
+    bool useGestureTrigger_;
+    bool gestureTrigger_;
 
     void reportKey(int button, bool pressed, ControllerId controller);
     bool handleSpecialKeys(int lincode, ControllerId controller, bool pressed);
-    void checkTrigger();
+    void checkTriggers();
 };
 
 } // namespace psmoveinput

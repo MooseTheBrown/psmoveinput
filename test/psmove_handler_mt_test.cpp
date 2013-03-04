@@ -94,7 +94,7 @@ public:
         psmoveinput::key_map keymap1{{Btn_T, KEY_1}};
         psmoveinput::key_map keymap2{{Btn_CROSS, KEY_2}};
         psmoveinput::MoveCoeffs coeffs{1.0, 1.0};
-        handler_ = new psmoveinput::PSMoveHandler(keymap1, keymap2, coeffs, 0, *dummyLog_);
+        handler_ = new psmoveinput::PSMoveHandler(keymap1, keymap2, coeffs, 0, 0, *dummyLog_);
         handler_->getKeySignal().connect(boost::bind(&TestListener::onKey,
                                                      &listener_,
                                                      _1, _2));

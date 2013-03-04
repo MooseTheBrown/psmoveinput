@@ -49,7 +49,8 @@ Config::Config() :
     connTimeout_(DEF_CONN_TIMEOUT),
     disconnectTimeout_(DEF_DISCONNECT_TIMEOUT),
     ledTimeout_(DEF_LED_UPDATE_TIMEOUT),
-    moveThreshold_(DEF_MOVE_THRESHOLD)
+    moveThreshold_(DEF_MOVE_THRESHOLD),
+    gestureThreshold_(DEF_GESTURE_THRESHOLD)
 {
     // command line options description
     optdesc_.add_options()
@@ -90,7 +91,12 @@ Config::Config() :
         (OPT_CONF_CONN_TIMEOUT, po::value<int>())
         (OPT_CONF_DISCONNECT_TIMEOUT, po::value<int>())
         (OPT_CONF_LED_UPDATE_TIMEOUT, po::value<int>())
-        (OPT_CONF_MOVE_THRESHOLD, po::value<int>());
+        (OPT_CONF_MOVE_THRESHOLD, po::value<int>())
+        (OPT_GESTURE_UP, po::value<std::string>())
+        (OPT_GESTURE_DOWN, po::value<std::string>())
+        (OPT_GESTURE_LEFT, po::value<std::string>())
+        (OPT_GESTURE_RIGHT, po::value<std::string>())
+        (OPT_CONF_GESTURE_THRESHOLD, po::value<int>());
 }
 
 Config::~Config()
@@ -260,12 +266,18 @@ void Config::parseConfig()
         {
             moveThreshold_= conf_opts_[OPT_CONF_MOVE_THRESHOLD].as<int>();
         }
+        // store gesture threshold
+        if (conf_opts_.count(OPT_CONF_GESTURE_THRESHOLD))
+        {
+            gestureThreshold_= conf_opts_[OPT_CONF_GESTURE_THRESHOLD].as<int>();
+        }
 
         // add key map entries one by one
         const std::vector<boost::shared_ptr<po::option_description>> &opts = configdesc_.options();
         for (boost::shared_ptr<po::option_description> opt : opts)
         {
             const std::string &longname = opt->long_name();
+            // filter out non-key options
             if ( (longname != OPT_CONF_PID) &&
                  (longname != OPT_CONF_LOG) &&
                  (longname != OPT_MOVEC_X) &&
@@ -276,6 +288,7 @@ void Config::parseConfig()
                  (longname != OPT_CONF_DISCONNECT_TIMEOUT) &&
                  (longname != OPT_CONF_LED_UPDATE_TIMEOUT) &&
                  (longname != OPT_CONF_MOVE_THRESHOLD) &&
+                 (longname != OPT_CONF_GESTURE_THRESHOLD) &&
                  conf_opts_.count(longname) )
             {
                 KeyMapEntry entry;
@@ -295,6 +308,7 @@ void Config::parseConfig()
                         // first controller
                         keymaps_[0].push_back(entry);
                     }
+                    // gesture options go to the second controller map
                     else
                     {
                         // second controller

@@ -83,14 +83,27 @@ namespace psmoveinput
 #define OPT_CONF_DISCONNECT_TIMEOUT "DISCONNECT_TIMEOUT"
 #define OPT_CONF_LED_UPDATE_TIMEOUT "LED_UPDATE_TIMEOUT"
 #define OPT_CONF_MOVE_THRESHOLD "MOVE_THRESHOLD"
+#define OPT_GESTURE_UP "GESTURE_UP"
+#define OPT_GESTURE_DOWN "GESTURE_DOWN"
+#define OPT_GESTURE_LEFT "GESTURE_LEFT"
+#define OPT_GESTURE_RIGHT "GESTURE_RIGHT"
+#define OPT_CONF_GESTURE_THRESHOLD "GESTURE_THRESHOLD"
 
 // operation modes
 #define OPT_MODE_STANDALONE "standalone"
 #define OPT_MODE_CLIENT     "client"
 
-// special buttons handled by psmoveinput itself
-#define KEY_PSMOVE_DISCONNECT KEY_MAX + 1
-#define KEY_PSMOVE_MOVE_TRIGGER KEY_MAX + 2
+// special keys handled by psmoveinput itself
+#define KEY_PSMOVE_DISCONNECT           KEY_MAX + 1
+#define KEY_PSMOVE_MOVE_TRIGGER         KEY_MAX + 2
+#define KEY_PSMOVE_GESTURE_TRIGGER      KEY_MAX + 3
+
+// gesture button codes
+// they should not overlap with psmoveapi button codes defined in psmove.h
+#define BTN_GESTURE_UP      0x01000000
+#define BTN_GESTURE_DOWN    0x02000000
+#define BTN_GESTURE_LEFT    0x04000000
+#define BTN_GESTURE_RIGHT   0x08000000
 
 // defaults
 #define DEF_PIDFILE "/var/run/psmoveinput.pid"
@@ -103,7 +116,8 @@ namespace psmoveinput
 #define DEF_CONN_TIMEOUT 3000 // ms
 #define DEF_DISCONNECT_TIMEOUT 7 // s
 #define DEF_LED_UPDATE_TIMEOUT 4000 // ms
-#define DEF_MOVE_THRESHOLD 0
+#define DEF_MOVE_THRESHOLD 0 // pixels
+#define DEF_GESTURE_THRESHOLD 50 // pixels
 
 } // namespace psmoveinput
 

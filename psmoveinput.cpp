@@ -320,6 +320,7 @@ void PSMoveInput::initHandler()
                                  config_.getKeyMap(ControllerId::SECOND),
                                  config_.getMoveCoeffs(),
                                  config_.getMoveThreshold(),
+                                 config_.getGestureThreshold(),
                                  *log_);
 
     // connect handler signals to device slots
@@ -341,9 +342,11 @@ void PSMoveInput::startListener()
 
     // connect listener signals to handler slots
     gyro_signal &gyroSignal = listener_->getGyroSignal();
+    gyro_signal &gestureSignal = listener_->getGestureSignal();
     button_signal &buttonSignal = listener_->getButtonSignal();
 
     gyroSignal.connect(boost::bind(&PSMoveHandler::onGyroscope, handler_, _1, _2));
+    gestureSignal.connect(boost::bind(&PSMoveHandler::onGesture, handler_, _1, _2));
     buttonSignal.connect(boost::bind(&PSMoveHandler::onButtons, handler_, _1, _2));
 
     // connect handler's disconnect signal to listener's slot

@@ -48,6 +48,7 @@ public:
     virtual ~PSMoveListener();
 
     gyro_signal &getGyroSignal() { return gyroSignal_; }
+    gyro_signal &getGestureSignal() { return gestureSignal_; }
     button_signal &getButtonSignal() { return buttonSignal_; }
     void run();
     void stop();
@@ -99,6 +100,7 @@ protected:
     };
 
     gyro_signal gyroSignal_;
+    gyro_signal gestureSignal_;
     button_signal buttonSignal_;
     Log &log_;
     bool stop_;

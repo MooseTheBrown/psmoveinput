@@ -62,9 +62,12 @@ public:
         psmoveinput::key_map keymap1{{Btn_CROSS, KEY_X},
                                      {Btn_START, KEY_ENTER},
                                      {Btn_TRIANGLE, KEY_PSMOVE_DISCONNECT}};
-        psmoveinput::key_map keymap2{{Btn_CROSS, KEY_SPACE}, {Btn_START, KEY_DOWN}};
+        psmoveinput::key_map keymap2{{Btn_CROSS, KEY_SPACE},
+                                     {Btn_START, KEY_DOWN},
+                                     {BTN_GESTURE_RIGHT, KEY_R},
+                                     {BTN_GESTURE_DOWN, KEY_D}};
         psmoveinput::MoveCoeffs coeffs{0.5, 2.0};
-        handler_ = new psmoveinput::PSMoveHandler(keymap1, keymap2, coeffs, 100, *dummyLog_);
+        handler_ = new psmoveinput::PSMoveHandler(keymap1, keymap2, coeffs, 100, 50, *dummyLog_);
         handler_->getMoveSignal().connect(boost::bind(&TestListener::onMove,
                                                       &listener_,
                                                       _1, _2));
@@ -114,6 +117,32 @@ TEST_F(PSMoveHandlerTest, Gyroscope)
     ASSERT_TRUE(listener_.dx_ <= 210);
     ASSERT_TRUE(listener_.dx_ >= 150);
     ASSERT_EQ(0, listener_.dy_);
+}
+
+TEST_F(PSMoveHandlerTest, Gestures)
+{
+    handler_->onGesture(1, 1);
+    // as with cursor movements, the first reading should not produce any event,
+    // it is just for the timestamp taking
+    ASSERT_EQ(0, listener_.code_);
+    ASSERT_EQ(false, listener_.pressed_);
+
+    boost::this_thread::sleep(boost::posix_time::millisec(10));
+    handler_->onGesture(20, 1);
+    // handler should calculate approximately 20 * 10 * 0.5 = 100 pixels on x axis,
+    // which is above the gesture threshold of 50 pixels and report KEY_R
+    ASSERT_EQ(KEY_R, listener_.code_);
+    ASSERT_EQ(false, listener_.pressed_);
+    // on y axis it should be 1 * 10 * 2 = 20, which is below 50 pixel threshold
+
+    boost::this_thread::sleep(boost::posix_time::millisec(10));
+    handler_->onGesture(0, -50);
+    // this time handler should get approximately 50 * 10 * 2 = 1000 pixels on y axis
+    // and report KEY_D
+    ASSERT_EQ(KEY_D, listener_.code_);
+    ASSERT_EQ(false, listener_.pressed_);
+    // we check pressed for false because handler should report
+    // key press and key release before returning from onGesture()
 }
 
 TEST_F(PSMoveHandlerTest, CorrectButtons)
@@ -176,9 +205,12 @@ public:
         dummyLog_ = new psmoveinput::Log(psmoveinput::LogParams("dummylog",
                                                                 psmoveinput::LogLevel::INFO));
         psmoveinput::key_map keymap1{{Btn_MOVE, KEY_PSMOVE_MOVE_TRIGGER}};
-        psmoveinput::key_map keymap2{{Btn_CROSS, KEY_SPACE}, {Btn_START, KEY_DOWN}};
+        psmoveinput::key_map keymap2{{Btn_CROSS, KEY_SPACE},
+                                     {Btn_START, KEY_DOWN},
+                                     {BTN_GESTURE_LEFT, KEY_L},
+                                     {Btn_T, KEY_PSMOVE_GESTURE_TRIGGER}};
         psmoveinput::MoveCoeffs coeffs{1.0, 1.0};
-        handler_ = new psmoveinput::PSMoveHandler(keymap1, keymap2, coeffs, 0, *dummyLog_);
+        handler_ = new psmoveinput::PSMoveHandler(keymap1, keymap2, coeffs, 0, 40, *dummyLog_);
         handler_->getMoveSignal().connect(boost::bind(&TestListener::onMove,
                                                       &listener_,
                                                       _1, _2));
@@ -219,6 +251,38 @@ TEST_F(PSMoveHandlerTriggerTest, MoveTrigger)
     handler_->onGyroscope(20, 20);
     ASSERT_EQ(0, listener_.dx_);
     ASSERT_EQ(0, listener_.dy_);
+}
+
+TEST_F(PSMoveHandlerTriggerTest, GestureTrigger)
+{
+    handler_->onGesture(1, 1);
+    // no key reports, only timestamp taken by the handler
+
+    boost::this_thread::sleep(boost::posix_time::millisec(10));
+    handler_->onGesture(-10, 3);
+    // although x axis movement (-10 * 10 * 1 = -100) is above the threshold value (40),
+    // no key should be reported without gesture trigger pressed
+    ASSERT_EQ(0, listener_.code_);
+    ASSERT_EQ(false, listener_.pressed_);
+
+    boost::this_thread::sleep(boost::posix_time::millisec(10));
+    // press trigger button
+    handler_->onButtons(Btn_T, psmoveinput::ControllerId::SECOND);
+    handler_->onGesture(-7, 2);
+    // this time x axis movement of -70 should produce KEY_L report
+    ASSERT_EQ(KEY_L, listener_.code_);
+    ASSERT_EQ(false, listener_.pressed_);
+
+    boost::this_thread::sleep(boost::posix_time::millisec(10));
+
+    // release the trigger
+    handler_->onButtons(0, psmoveinput::ControllerId::SECOND);
+    listener_.code_ = 0;
+    listener_.pressed_ = false;
+
+    handler_->onGesture(-20, 0);
+    ASSERT_EQ(0, listener_.code_);
+    ASSERT_EQ(false, listener_.pressed_);
 }
 
 } // namespace psmovehandler_test
