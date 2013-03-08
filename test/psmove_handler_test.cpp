@@ -197,6 +197,53 @@ TEST_F(PSMoveHandlerTest, IncorrectButtons)
     ASSERT_EQ(false, listener_.pressed_);
 }
 
+TEST_F(PSMoveHandlerTest, HandlerReset)
+{
+    // report single key press
+    handler_->onButtons(Btn_CROSS, psmoveinput::ControllerId::FIRST);
+    ASSERT_EQ(KEY_X, listener_.code_);
+    ASSERT_EQ(true, listener_.pressed_);
+
+    // now reset handler's internal state
+    handler_->reset();
+
+    // report the same key again and verify that the handler in turn reports the same key
+    handler_->onButtons(Btn_CROSS, psmoveinput::ControllerId::FIRST);
+    ASSERT_EQ(KEY_X, listener_.code_);
+    ASSERT_EQ(true, listener_.pressed_);
+
+    // reset again
+    handler_->reset();
+
+    // report key release, which should not be reported by the handler
+    listener_.code_ = 0;
+    listener_.pressed_ = false;
+    handler_->onButtons(0, psmoveinput::ControllerId::FIRST);
+    ASSERT_EQ(0, listener_.code_);
+    ASSERT_EQ(false, listener_.pressed_);
+
+    // same procedure for the second controller
+    handler_->onButtons(Btn_CROSS, psmoveinput::ControllerId::SECOND);
+    ASSERT_EQ(KEY_SPACE, listener_.code_);
+    ASSERT_EQ(true, listener_.pressed_);
+
+    handler_->reset();
+
+    handler_->onButtons(Btn_CROSS, psmoveinput::ControllerId::SECOND);
+    ASSERT_EQ(KEY_SPACE, listener_.code_);
+    ASSERT_EQ(true, listener_.pressed_);
+
+    // reset again
+    handler_->reset();
+
+    // report key release, which should not be reported by the handler
+    listener_.code_ = 0;
+    listener_.pressed_ = false;
+    handler_->onButtons(0, psmoveinput::ControllerId::SECOND);
+    ASSERT_EQ(0, listener_.code_);
+    ASSERT_EQ(false, listener_.pressed_);
+}
+
 class PSMoveHandlerTriggerTest : public PSMoveHandlerTest
 {
 public:

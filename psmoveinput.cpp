@@ -344,14 +344,22 @@ void PSMoveInput::startListener()
     gyro_signal &gyroSignal = listener_->getGyroSignal();
     gyro_signal &gestureSignal = listener_->getGestureSignal();
     button_signal &buttonSignal = listener_->getButtonSignal();
+    disconnect_complete_signal &disconnectCompleteSignal = listener_->getDisconnectCompleteSignal();
 
     gyroSignal.connect(boost::bind(&PSMoveHandler::onGyroscope, handler_, _1, _2));
     gestureSignal.connect(boost::bind(&PSMoveHandler::onGesture, handler_, _1, _2));
     buttonSignal.connect(boost::bind(&PSMoveHandler::onButtons, handler_, _1, _2));
+    disconnectCompleteSignal.connect(boost::bind(&PSMoveHandler::reset, handler_));
 
     // connect handler's disconnect signal to listener's slot
     disconnect_signal &disconnectSignal = handler_->getDisconnectSignal();
     disconnectSignal.connect(boost::bind(&PSMoveListener::onDisconnectKey, listener_, _1));
+
+    /* NOTE: There are two disconnect signals. One belongs to PSMoveHandler and is used to
+       notify PSMoveListener on disconnect button being pressed on one of the controllers.
+       Another is PSMoveListener's "disconnect complete" signal. It is raised when all
+       controller threads are disconnected (as a result of either disconnect key press or
+       expiring disconnect timeout), and PSMoveHandler has to reset its internal state. */
 
     listener_->run();
 }

@@ -220,6 +220,18 @@ void PSMoveHandler::onButtons(int buttons, ControllerId controller)
     }
 }
 
+void PSMoveHandler::reset()
+{
+    buttons_[0] = 0;
+    buttons_[1] = 0;
+    lastGyroTp_.tv_sec = 0;
+    lastGyroTp_.tv_nsec = 0;
+    lastGestureTp_.tv_sec = 0;
+    lastGestureTp_.tv_nsec = 0;
+    moveTrigger_ = false;
+    gestureTrigger_ = false;
+}
+
 void PSMoveHandler::reportKey(int button, bool pressed, ControllerId controller)
 {
     key_map *keymap = nullptr;

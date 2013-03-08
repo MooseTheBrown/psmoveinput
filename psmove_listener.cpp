@@ -97,6 +97,8 @@ void PSMoveListener::run()
                 // no need to use mutex here because at this poing there's only one
                 // main thread remaining
                 threadStop_ = false;
+                // notify that all controllers have been disconnected
+                disconnectCompleteSignal_();
             }
         }
 

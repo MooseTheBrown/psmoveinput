@@ -53,6 +53,7 @@ public:
     void onGyroscope(int gx, int gy);
     void onGesture(int gx, int gy);
     void onButtons(int buttons, ControllerId controller);
+    void reset();
 
     move_signal &getMoveSignal() { return move_signal_; }
     key_signal &getKeySignal() { return key_signal_; }

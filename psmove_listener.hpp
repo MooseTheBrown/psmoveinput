@@ -35,6 +35,7 @@ namespace psmoveinput
 
 typedef boost::signals2::signal<void (int, int)> gyro_signal;
 typedef boost::signals2::signal<void (int, ControllerId)> button_signal;
+typedef boost::signals2::signal<void ()> disconnect_complete_signal;
 
 class PSMoveListener
 {
@@ -50,6 +51,7 @@ public:
     gyro_signal &getGyroSignal() { return gyroSignal_; }
     gyro_signal &getGestureSignal() { return gestureSignal_; }
     button_signal &getButtonSignal() { return buttonSignal_; }
+    disconnect_complete_signal &getDisconnectCompleteSignal() { return disconnectCompleteSignal_; }
     void run();
     void stop();
     bool needToStop() { return (stop_ || threadStop_); }
@@ -102,6 +104,7 @@ protected:
     gyro_signal gyroSignal_;
     gyro_signal gestureSignal_;
     button_signal buttonSignal_;
+    disconnect_complete_signal disconnectCompleteSignal_;
     Log &log_;
     bool stop_;
     OpMode mode_;
