@@ -104,6 +104,7 @@ namespace psmoveinput
 #define BTN_GESTURE_DOWN    0x02000000
 #define BTN_GESTURE_LEFT    0x04000000
 #define BTN_GESTURE_RIGHT   0x08000000
+#define BTN_GESTURE_MASK    0x00FFFFFF
 
 // defaults
 #define DEF_PIDFILE "/var/run/psmoveinput.pid"

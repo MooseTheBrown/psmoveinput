@@ -34,20 +34,17 @@ public:
     TestListener() :
         dx_(0),
         dy_(0),
-        code_(0),
-        pressed_(false),
         disconnect_(false)
     {
     }
     virtual ~TestListener() {}
     void onMove(int dx, int dy) { dx_ = dx; dy_ = dy; }
-    void onKey(int code, bool pressed) { code_ = code; pressed_ = pressed; }
+    void onKey(int code, bool pressed) { keys_.push_back(std::make_pair(code, pressed)); }
     void onDisconnect(psmoveinput::ControllerId id) { disconnect_ = true; id_ = id; }
 
     int dx_;
     int dy_;
-    int code_;
-    bool pressed_;
+    std::vector<std::pair<int, bool>> keys_;
     bool disconnect_;
     psmoveinput::ControllerId id_;
 };
@@ -124,25 +121,68 @@ TEST_F(PSMoveHandlerTest, Gestures)
     handler_->onGesture(1, 1);
     // as with cursor movements, the first reading should not produce any event,
     // it is just for the timestamp taking
-    ASSERT_EQ(0, listener_.code_);
-    ASSERT_EQ(false, listener_.pressed_);
+    ASSERT_EQ(0, listener_.keys_.size());
 
     boost::this_thread::sleep(boost::posix_time::millisec(10));
     handler_->onGesture(20, 1);
     // handler should calculate approximately 20 * 10 * 0.5 = 100 pixels on x axis,
     // which is above the gesture threshold of 50 pixels and report KEY_R
-    ASSERT_EQ(KEY_R, listener_.code_);
-    ASSERT_EQ(false, listener_.pressed_);
+    ASSERT_EQ(KEY_R, listener_.keys_[0].first);
+    ASSERT_EQ(true, listener_.keys_[0].second);
     // on y axis it should be 1 * 10 * 2 = 20, which is below 50 pixel threshold
+
+    boost::this_thread::sleep(boost::posix_time::millisec(10));
+    // emulate controller movement in the same direction
+    handler_->onGesture(30, 0);
+    // handler should not report anything, KEY_R should still be pressed
+    ASSERT_EQ(KEY_R, listener_.keys_.back().first);
+    ASSERT_EQ(true, listener_.keys_.back().second);
 
     boost::this_thread::sleep(boost::posix_time::millisec(10));
     handler_->onGesture(0, -50);
     // this time handler should get approximately 50 * 10 * 2 = 1000 pixels on y axis
-    // and report KEY_D
-    ASSERT_EQ(KEY_D, listener_.code_);
-    ASSERT_EQ(false, listener_.pressed_);
-    // we check pressed for false because handler should report
-    // key press and key release before returning from onGesture()
+    // and report KEY_D, while KEY_R should be released
+    bool key_r_found = false;
+    bool key_d_found = false;
+    for (int i = 1; i < 3; i++)
+    {
+        
+        std::pair<int, bool> key = listener_.keys_[i];
+        if (key.first == KEY_R)
+        {
+            key_r_found = true;
+            ASSERT_EQ(false, key.second);
+        }
+        else if (key.first == KEY_D)
+        {
+            key_d_found = true;
+            ASSERT_EQ(true, key.second);
+        }
+    }
+    ASSERT_TRUE(key_d_found);
+    ASSERT_TRUE(key_r_found);
+
+    handler_->onGesture(0, 0);
+    boost::this_thread::sleep(boost::posix_time::millisec(10));
+
+    // now emulate two gestures: the second short time after the first,
+    // while the first is still active
+    listener_.keys_.clear();
+    handler_->onGesture(20, 0);
+    ASSERT_EQ(KEY_R, listener_.keys_.back().first);
+    ASSERT_EQ(true, listener_.keys_.back().second);
+    boost::this_thread::sleep(boost::posix_time::millisec(10));
+    handler_->onGesture(20, -50);
+    ASSERT_EQ(2, listener_.keys_.size());
+    ASSERT_EQ(KEY_D, listener_.keys_.back().first);
+    ASSERT_EQ(true, listener_.keys_.back().second);
+    boost::this_thread::sleep(boost::posix_time::millisec(10));
+    handler_->onGesture(-20, -50);
+    // gesture "up" is no longer active, so KEY_R should be released,
+    // but KEY_D should remain pressed
+    ASSERT_EQ(3, listener_.keys_.size());
+    ASSERT_EQ(KEY_R, listener_.keys_.back().first);
+    ASSERT_EQ(false, listener_.keys_.back().second);
 }
 
 TEST_F(PSMoveHandlerTest, CorrectButtons)
@@ -151,37 +191,37 @@ TEST_F(PSMoveHandlerTest, CorrectButtons)
 
     // first controller
     handler_->onButtons(Btn_CROSS, psmoveinput::ControllerId::FIRST);
-    ASSERT_EQ(KEY_X, listener_.code_);
-    ASSERT_EQ(true, listener_.pressed_);
+    ASSERT_EQ(KEY_X, listener_.keys_.back().first);
+    ASSERT_EQ(true, listener_.keys_.back().second);
 
     handler_->onButtons(0, psmoveinput::ControllerId::FIRST);
-    ASSERT_EQ(KEY_X, listener_.code_);
-    ASSERT_EQ(false, listener_.pressed_);
+    ASSERT_EQ(KEY_X, listener_.keys_.back().first);
+    ASSERT_EQ(false, listener_.keys_.back().second);
 
     handler_->onButtons(Btn_START, psmoveinput::ControllerId::FIRST);
-    ASSERT_EQ(KEY_ENTER, listener_.code_);
-    ASSERT_EQ(true, listener_.pressed_);
+    ASSERT_EQ(KEY_ENTER, listener_.keys_.back().first);
+    ASSERT_EQ(true, listener_.keys_.back().second);
 
     handler_->onButtons(0, psmoveinput::ControllerId::FIRST);
-    ASSERT_EQ(KEY_ENTER, listener_.code_);
-    ASSERT_EQ(false, listener_.pressed_);
+    ASSERT_EQ(KEY_ENTER, listener_.keys_.back().first);
+    ASSERT_EQ(false, listener_.keys_.back().second);
 
     // second controller
     handler_->onButtons(Btn_CROSS, psmoveinput::ControllerId::SECOND);
-    ASSERT_EQ(KEY_SPACE, listener_.code_);
-    ASSERT_EQ(true, listener_.pressed_);
+    ASSERT_EQ(KEY_SPACE, listener_.keys_.back().first);
+    ASSERT_EQ(true, listener_.keys_.back().second);
 
     handler_->onButtons(0, psmoveinput::ControllerId::SECOND);
-    ASSERT_EQ(KEY_SPACE, listener_.code_);
-    ASSERT_EQ(false, listener_.pressed_);
+    ASSERT_EQ(KEY_SPACE, listener_.keys_.back().first);
+    ASSERT_EQ(false, listener_.keys_.back().second);
 
     handler_->onButtons(Btn_START, psmoveinput::ControllerId::SECOND);
-    ASSERT_EQ(KEY_DOWN, listener_.code_);
-    ASSERT_EQ(true, listener_.pressed_);
+    ASSERT_EQ(KEY_DOWN, listener_.keys_.back().first);
+    ASSERT_EQ(true, listener_.keys_.back().second);
 
     handler_->onButtons(0, psmoveinput::ControllerId::SECOND);
-    ASSERT_EQ(KEY_DOWN, listener_.code_);
-    ASSERT_EQ(false, listener_.pressed_);
+    ASSERT_EQ(KEY_DOWN, listener_.keys_.back().first);
+    ASSERT_EQ(false, listener_.keys_.back().second);
 
     // disconnect button
     handler_->onButtons(Btn_TRIANGLE, psmoveinput::ControllerId::FIRST);
@@ -193,55 +233,50 @@ TEST_F(PSMoveHandlerTest, IncorrectButtons)
 {
     // report keys, which are not present in the handler's key map
     handler_->onButtons(Btn_SELECT, psmoveinput::ControllerId::FIRST);
-    ASSERT_EQ(0, listener_.code_);
-    ASSERT_EQ(false, listener_.pressed_);
+    ASSERT_EQ(0, listener_.keys_.size());
 }
 
 TEST_F(PSMoveHandlerTest, HandlerReset)
 {
     // report single key press
     handler_->onButtons(Btn_CROSS, psmoveinput::ControllerId::FIRST);
-    ASSERT_EQ(KEY_X, listener_.code_);
-    ASSERT_EQ(true, listener_.pressed_);
+    ASSERT_EQ(KEY_X, listener_.keys_.back().first);
+    ASSERT_EQ(true, listener_.keys_.back().second);
 
     // now reset handler's internal state
     handler_->reset();
 
     // report the same key again and verify that the handler in turn reports the same key
     handler_->onButtons(Btn_CROSS, psmoveinput::ControllerId::FIRST);
-    ASSERT_EQ(KEY_X, listener_.code_);
-    ASSERT_EQ(true, listener_.pressed_);
+    ASSERT_EQ(KEY_X, listener_.keys_.back().first);
+    ASSERT_EQ(true, listener_.keys_.back().second);
 
     // reset again
     handler_->reset();
 
     // report key release, which should not be reported by the handler
-    listener_.code_ = 0;
-    listener_.pressed_ = false;
+    listener_.keys_.clear();
     handler_->onButtons(0, psmoveinput::ControllerId::FIRST);
-    ASSERT_EQ(0, listener_.code_);
-    ASSERT_EQ(false, listener_.pressed_);
+    ASSERT_EQ(0, listener_.keys_.size());
 
     // same procedure for the second controller
     handler_->onButtons(Btn_CROSS, psmoveinput::ControllerId::SECOND);
-    ASSERT_EQ(KEY_SPACE, listener_.code_);
-    ASSERT_EQ(true, listener_.pressed_);
+    ASSERT_EQ(KEY_SPACE, listener_.keys_.back().first);
+    ASSERT_EQ(true, listener_.keys_.back().second);
 
     handler_->reset();
 
     handler_->onButtons(Btn_CROSS, psmoveinput::ControllerId::SECOND);
-    ASSERT_EQ(KEY_SPACE, listener_.code_);
-    ASSERT_EQ(true, listener_.pressed_);
+    ASSERT_EQ(KEY_SPACE, listener_.keys_.back().first);
+    ASSERT_EQ(true, listener_.keys_.back().second);
 
     // reset again
     handler_->reset();
 
     // report key release, which should not be reported by the handler
-    listener_.code_ = 0;
-    listener_.pressed_ = false;
+    listener_.keys_.clear();
     handler_->onButtons(0, psmoveinput::ControllerId::SECOND);
-    ASSERT_EQ(0, listener_.code_);
-    ASSERT_EQ(false, listener_.pressed_);
+    ASSERT_EQ(0, listener_.keys_.size());
 }
 
 class PSMoveHandlerTriggerTest : public PSMoveHandlerTest
@@ -309,27 +344,28 @@ TEST_F(PSMoveHandlerTriggerTest, GestureTrigger)
     handler_->onGesture(-10, 3);
     // although x axis movement (-10 * 10 * 1 = -100) is above the threshold value (40),
     // no key should be reported without gesture trigger pressed
-    ASSERT_EQ(0, listener_.code_);
-    ASSERT_EQ(false, listener_.pressed_);
+    ASSERT_EQ(0, listener_.keys_.size());
 
     boost::this_thread::sleep(boost::posix_time::millisec(10));
     // press trigger button
     handler_->onButtons(Btn_T, psmoveinput::ControllerId::SECOND);
     handler_->onGesture(-7, 2);
     // this time x axis movement of -70 should produce KEY_L report
-    ASSERT_EQ(KEY_L, listener_.code_);
-    ASSERT_EQ(false, listener_.pressed_);
+    ASSERT_EQ(KEY_L, listener_.keys_.back().first);
+    ASSERT_EQ(true, listener_.keys_.back().second);
 
     boost::this_thread::sleep(boost::posix_time::millisec(10));
 
-    // release the trigger
+    // release the trigger; this should immediately release all pressed
+    // gesture keys
     handler_->onButtons(0, psmoveinput::ControllerId::SECOND);
-    listener_.code_ = 0;
-    listener_.pressed_ = false;
+    ASSERT_EQ(KEY_L, listener_.keys_.back().first);
+    ASSERT_EQ(false, listener_.keys_.back().second);
+
+    listener_.keys_.clear();
 
     handler_->onGesture(-20, 0);
-    ASSERT_EQ(0, listener_.code_);
-    ASSERT_EQ(false, listener_.pressed_);
+    ASSERT_EQ(0, listener_.keys_.size());
 }
 
 } // namespace psmovehandler_test

@@ -38,7 +38,8 @@ PSMoveHandler::PSMoveHandler(const key_map &keymap1,
     useMoveTrigger_(false),
     moveTrigger_(false),
     useGestureTrigger_(false),
-    gestureTrigger_(false)
+    gestureTrigger_(false),
+    releaseGestureKeys_(false)
 {
     coeffs_.cx = coeffs.cx;
     coeffs_.cy = coeffs.cy;
@@ -178,11 +179,8 @@ void PSMoveHandler::onGesture(int gx, int gy)
                 gestureButtons |= BTN_GESTURE_DOWN;
                 log_.write("Gesture DOWN");
             }
-
-            // report gesture button presses
-            onButtons(gestureButtons | buttons_[1], ControllerId::SECOND);
-            // report gesture buttons releases
-            onButtons(gestureButtons ^ buttons_[1], ControllerId::SECOND);
+            // report gesture buttons
+            onButtons(gestureButtons | (buttons_[1] & BTN_GESTURE_MASK), ControllerId::SECOND);
         }
     }
     
@@ -192,8 +190,6 @@ void PSMoveHandler::onGesture(int gx, int gy)
 
 void PSMoveHandler::onButtons(int buttons, ControllerId controller)
 {
-    boost::lock_guard<boost::mutex> lock(mutex_);
-
     log_.write(boost::str(boost::format("PSMoveHandler::onButtons(%1%)") % buttons).c_str());
     log_.write(boost::str(boost::format("PSMoveHandler::buttons_ = %1%") % buttons_).c_str());
 
@@ -206,6 +202,7 @@ void PSMoveHandler::onButtons(int buttons, ControllerId controller)
 
         for (int i = 1; i <= BTN_GESTURE_RIGHT; i <<= 1)
         {
+            boost::lock_guard<boost::mutex> lock(mutex_);
             if (pressed & i)
             {
                 reportKey(i, true, controller);
@@ -217,6 +214,12 @@ void PSMoveHandler::onButtons(int buttons, ControllerId controller)
         }
 
         buttons_[buttonIndex] = buttons;
+    }
+
+    if (releaseGestureKeys_ == true)
+    {
+        releaseGestureKeys_ = false;
+        onGesture(0, 0);
     }
 }
 
@@ -270,11 +273,21 @@ bool PSMoveHandler::handleSpecialKeys(int lincode, ControllerId controller, bool
         disconnect_signal_(controller);
         ret = true;
     }
-    else if((controller == ControllerId::FIRST) && (lincode == KEY_PSMOVE_MOVE_TRIGGER)) {
+    else if((controller == ControllerId::FIRST) && (lincode == KEY_PSMOVE_MOVE_TRIGGER))
+    {
         moveTrigger_ = pressed;
         ret = true;
     }
-    else if((controller == ControllerId::SECOND) && (lincode == KEY_PSMOVE_GESTURE_TRIGGER)) {
+    else if((controller == ControllerId::SECOND) && (lincode == KEY_PSMOVE_GESTURE_TRIGGER))
+    {
+        if ((gestureTrigger_ == true) && (pressed == false))
+        {
+            /* When gesture trigger is released, we need to release all gesture keys,
+               but not in this section of code because it is protected with mutex,
+               and calling onGesture() from here would lead to dead lock. */
+            releaseGestureKeys_ = true;
+        }
+
         gestureTrigger_ = pressed;
         ret = true;
     }

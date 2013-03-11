@@ -45,7 +45,7 @@ public:
     std::vector<KeyEvt> keyEvents_;
 };
 
-#define NUM_KEY_EVTS    4
+#define NUM_KEY_EVTS    40000
 
 class TestThread
 {

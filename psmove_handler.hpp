@@ -76,6 +76,7 @@ protected:
     bool moveTrigger_;
     bool useGestureTrigger_;
     bool gestureTrigger_;
+    bool releaseGestureKeys_;
 
     void reportKey(int button, bool pressed, ControllerId controller);
     bool handleSpecialKeys(int lincode, ControllerId controller, bool pressed);
