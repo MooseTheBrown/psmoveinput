@@ -291,6 +291,16 @@ bool PSMoveHandler::handleSpecialKeys(int lincode, ControllerId controller, bool
         gestureTrigger_ = pressed;
         ret = true;
     }
+    else if(lincode == KEY_PSMOVE_MWHEEL_UP)
+    {
+        mwheel_signal_(1);
+        ret = true;
+    }
+    else if(lincode == KEY_PSMOVE_MWHEEL_DOWN)
+    {
+        mwheel_signal_(-1);
+        ret = true;
+    }
 
     return ret;
 }

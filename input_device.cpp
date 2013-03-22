@@ -47,6 +47,7 @@ InputDevice::InputDevice(const char *devname, key_array &keys, Log &log) :
     ioctl(fd_, UI_SET_EVBIT, EV_REL);
     ioctl(fd_, UI_SET_RELBIT, REL_X);
     ioctl(fd_, UI_SET_RELBIT, REL_Y);
+    ioctl(fd_, UI_SET_RELBIT, REL_WHEEL);
     ioctl(fd_, UI_SET_EVBIT, EV_KEY);
     for (int key : keys)
     {
@@ -120,6 +121,23 @@ void InputDevice::reportKey(int code, bool pressed)
     reportSyn();
 
     log_.write(boost::str(boost::format("InputDevice::reportKey(%1%, %2%)") % code % pressed).c_str());
+}
+
+void InputDevice::reportMWheel(int value)
+{
+    input_event event;
+
+    std::memset(&event, 0, sizeof (event));
+
+    event.type = EV_REL;
+    event.code = REL_WHEEL;
+    event.value = value;
+
+    write(fd_, &event, sizeof (event));
+
+    reportSyn();
+
+    log_.write(boost::str(boost::format("InputDevice::reportMWheel(%1%)") % value).c_str());
 }
 
 void InputDevice::reportSyn()

@@ -97,6 +97,8 @@ namespace psmoveinput
 #define KEY_PSMOVE_DISCONNECT           KEY_MAX + 1
 #define KEY_PSMOVE_MOVE_TRIGGER         KEY_MAX + 2
 #define KEY_PSMOVE_GESTURE_TRIGGER      KEY_MAX + 3
+#define KEY_PSMOVE_MWHEEL_UP            KEY_MAX + 4
+#define KEY_PSMOVE_MWHEEL_DOWN          KEY_MAX + 5
 
 // gesture button codes
 // they should not overlap with psmoveapi button codes defined in psmove.h

@@ -34,19 +34,22 @@ public:
     TestListener() :
         dx_(0),
         dy_(0),
-        disconnect_(false)
+        disconnect_(false),
+        mwheel_value_(0)
     {
     }
     virtual ~TestListener() {}
     void onMove(int dx, int dy) { dx_ = dx; dy_ = dy; }
     void onKey(int code, bool pressed) { keys_.push_back(std::make_pair(code, pressed)); }
     void onDisconnect(psmoveinput::ControllerId id) { disconnect_ = true; id_ = id; }
+    void onMWheel(int value) { mwheel_value_ = value; }
 
     int dx_;
     int dy_;
     std::vector<std::pair<int, bool>> keys_;
     bool disconnect_;
     psmoveinput::ControllerId id_;
+    int mwheel_value_;
 };
 
 class PSMoveHandlerTest : public testing::Test
@@ -58,7 +61,9 @@ public:
                                                                 psmoveinput::LogLevel::INFO));
         psmoveinput::key_map keymap1{{Btn_CROSS, KEY_X},
                                      {Btn_START, KEY_ENTER},
-                                     {Btn_TRIANGLE, KEY_PSMOVE_DISCONNECT}};
+                                     {Btn_TRIANGLE, KEY_PSMOVE_DISCONNECT},
+                                     {Btn_SQUARE, KEY_PSMOVE_MWHEEL_UP},
+                                     {Btn_CIRCLE, KEY_PSMOVE_MWHEEL_DOWN}};
         psmoveinput::key_map keymap2{{Btn_CROSS, KEY_SPACE},
                                      {Btn_START, KEY_DOWN},
                                      {BTN_GESTURE_RIGHT, KEY_R},
@@ -73,6 +78,8 @@ public:
                                                      _1, _2));
         handler_->getDisconnectSignal().connect(boost::bind(&TestListener::onDisconnect,
                                                             &listener_, _1));
+        handler_->getMWheelSignal().connect(boost::bind(&TestListener::onMWheel,
+                                                        &listener_, _1));
     }
 
     virtual void TearDown()
@@ -277,6 +284,15 @@ TEST_F(PSMoveHandlerTest, HandlerReset)
     listener_.keys_.clear();
     handler_->onButtons(0, psmoveinput::ControllerId::SECOND);
     ASSERT_EQ(0, listener_.keys_.size());
+}
+
+TEST_F(PSMoveHandlerTest, MWheel)
+{
+    handler_->onButtons(Btn_SQUARE, psmoveinput::ControllerId::FIRST);
+    ASSERT_EQ(1, listener_.mwheel_value_);
+    handler_->onButtons(0, psmoveinput::ControllerId::FIRST);
+    handler_->onButtons(Btn_CIRCLE, psmoveinput::ControllerId::FIRST);
+    ASSERT_EQ(-1, listener_.mwheel_value_);
 }
 
 class PSMoveHandlerTriggerTest : public PSMoveHandlerTest

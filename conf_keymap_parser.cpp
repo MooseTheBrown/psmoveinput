@@ -155,7 +155,9 @@ KeyMapParser::KeyMapParser() :
         std::make_pair("BTN_MIDDLE", BTN_MIDDLE),
         std::make_pair("disconnect", KEY_PSMOVE_DISCONNECT),
         std::make_pair("move_trigger", KEY_PSMOVE_MOVE_TRIGGER),
-        std::make_pair("gesture_trigger", KEY_PSMOVE_GESTURE_TRIGGER)
+        std::make_pair("gesture_trigger", KEY_PSMOVE_GESTURE_TRIGGER),
+        std::make_pair("MWHEEL_UP", KEY_PSMOVE_MWHEEL_UP),
+        std::make_pair("MWHEEL_DOWN", KEY_PSMOVE_MWHEEL_DOWN)
     }
 {
 }

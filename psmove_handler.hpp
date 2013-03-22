@@ -38,6 +38,7 @@ namespace psmoveinput
 typedef boost::signals2::signal<void (int, int)> move_signal;
 typedef boost::signals2::signal<void (int, bool)> key_signal;
 typedef boost::signals2::signal<void (ControllerId)> disconnect_signal;
+typedef boost::signals2::signal<void (int)> mwheel_signal;
 
 class PSMoveHandler
 {
@@ -58,11 +59,13 @@ public:
     move_signal &getMoveSignal() { return move_signal_; }
     key_signal &getKeySignal() { return key_signal_; }
     disconnect_signal &getDisconnectSignal() { return disconnect_signal_; }
+    mwheel_signal &getMWheelSignal() { return mwheel_signal_; }
 
 protected:
     move_signal move_signal_;
     key_signal key_signal_;
     disconnect_signal disconnect_signal_;
+    mwheel_signal mwheel_signal_;
     key_map keymaps_[MAX_CONTROLLERS];
     MoveCoeffs coeffs_;
     int buttons_[MAX_CONTROLLERS];

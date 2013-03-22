@@ -326,9 +326,11 @@ void PSMoveInput::initHandler()
     // connect handler signals to device slots
     move_signal &moveSignal = handler_->getMoveSignal();
     key_signal &keySignal = handler_->getKeySignal();
+    mwheel_signal &mwheelSignal = handler_->getMWheelSignal();
 
     moveSignal.connect(boost::bind(&InputDevice::reportMove, device_, _1, _2));
     keySignal.connect(boost::bind(&InputDevice::reportKey, device_, _1, _2));
+    mwheelSignal.connect(boost::bind(&InputDevice::reportMWheel, device_, _1));
 }
 
 void PSMoveInput::startListener()

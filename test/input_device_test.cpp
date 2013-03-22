@@ -330,4 +330,23 @@ TEST_F(InputDeviceTest, Keys)
     ASSERT_EQ(0, event->value);
 }
 
+TEST_F(InputDeviceTest, MWheel)
+{
+    const input_event *event;
+
+    // mouse wheel up
+    input_device_->reportMWheel(1);
+    event = dev_listener_->getLastEvent();
+    ASSERT_EQ(EV_REL, event->type);
+    ASSERT_EQ(REL_WHEEL, event->code);
+    ASSERT_EQ(1, event->value);
+
+    // mouse wheel down
+    input_device_->reportMWheel(-1);
+    event = dev_listener_->getLastEvent();
+    ASSERT_EQ(EV_REL, event->type);
+    ASSERT_EQ(REL_WHEEL, event->code);
+    ASSERT_EQ(-1, event->value);
+}
+
 } // namespace psmoveinput_test

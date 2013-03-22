@@ -42,6 +42,7 @@ public:
     const char *getDeviceName() { return devname_.c_str(); }
     void reportMove(int dx, int dy);
     void reportKey(int code, bool pressed);
+    void reportMWheel(int value);
 
 protected:
     int fd_;
