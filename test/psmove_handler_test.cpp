@@ -290,6 +290,7 @@ TEST_F(PSMoveHandlerTest, MWheel)
 {
     handler_->onButtons(Btn_SQUARE, psmoveinput::ControllerId::FIRST);
     ASSERT_EQ(1, listener_.mwheel_value_);
+    boost::this_thread::sleep(boost::posix_time::millisec(10));
     handler_->onButtons(0, psmoveinput::ControllerId::FIRST);
     handler_->onButtons(Btn_CIRCLE, psmoveinput::ControllerId::FIRST);
     ASSERT_EQ(-1, listener_.mwheel_value_);

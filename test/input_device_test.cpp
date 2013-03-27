@@ -341,6 +341,8 @@ TEST_F(InputDeviceTest, MWheel)
     ASSERT_EQ(REL_WHEEL, event->code);
     ASSERT_EQ(1, event->value);
 
+    boost::this_thread::sleep(boost::posix_time::millisec(100));
+
     // mouse wheel down
     input_device_->reportMWheel(-1);
     event = dev_listener_->getLastEvent();
