@@ -45,7 +45,8 @@ public:
                    int pollTimeout,
                    int connectTimeout,
                    int disconnectTimeout,
-                   int ledTimeout);
+                   int ledTimeout,
+                   int gestureTimeout);
     virtual ~PSMoveListener();
 
     gyro_signal &getGyroSignal() { return gyroSignal_; }
@@ -74,7 +75,8 @@ protected:
                    PSMoveListener *listener,
                    int pollTimeout,
                    int disconnectTimeout,
-                   int ledTimeout);
+                   int ledTimeout,
+                   int gestureTimeout);
         void join() { if (thread_ != nullptr) thread_->join(); }
         bool running();
         void operator ()();
@@ -96,6 +98,7 @@ protected:
         int psmoveId_;
         std::string btaddr_;
         bool calibrated_;
+        int gestureTimeout_;
 
         void setLeds();
         void updateLeds();
@@ -115,6 +118,7 @@ protected:
     int connectTimeout_;
     int disconnectTimeout_;
     int ledTimeout_;
+    int gestureTimeout_;
 
     void init();
     void handleNewDevice(int psmoveId, PSMove *move);

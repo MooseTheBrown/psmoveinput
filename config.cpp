@@ -50,7 +50,8 @@ Config::Config() :
     disconnectTimeout_(DEF_DISCONNECT_TIMEOUT),
     ledTimeout_(DEF_LED_UPDATE_TIMEOUT),
     moveThreshold_(DEF_MOVE_THRESHOLD),
-    gestureThreshold_(DEF_GESTURE_THRESHOLD)
+    gestureThreshold_(DEF_GESTURE_THRESHOLD),
+    gestureTimeout_(DEF_GESTURE_TIMEOUT)
 {
     // command line options description
     optdesc_.add_options()
@@ -96,7 +97,8 @@ Config::Config() :
         (OPT_GESTURE_DOWN, po::value<std::string>())
         (OPT_GESTURE_LEFT, po::value<std::string>())
         (OPT_GESTURE_RIGHT, po::value<std::string>())
-        (OPT_CONF_GESTURE_THRESHOLD, po::value<int>());
+        (OPT_CONF_GESTURE_THRESHOLD, po::value<int>())
+        (OPT_CONF_GESTURE_TIMEOUT, po::value<int>());
 }
 
 Config::~Config()
@@ -261,6 +263,10 @@ void Config::parseConfig()
         {
             ledTimeout_= conf_opts_[OPT_CONF_LED_UPDATE_TIMEOUT].as<int>();
         }
+        if (conf_opts_.count(OPT_CONF_GESTURE_TIMEOUT))
+        {
+            gestureTimeout_ = conf_opts_[OPT_CONF_GESTURE_TIMEOUT].as<int>();
+        }
         // store move threshold
         if (conf_opts_.count(OPT_CONF_MOVE_THRESHOLD))
         {
@@ -289,6 +295,7 @@ void Config::parseConfig()
                  (longname != OPT_CONF_LED_UPDATE_TIMEOUT) &&
                  (longname != OPT_CONF_MOVE_THRESHOLD) &&
                  (longname != OPT_CONF_GESTURE_THRESHOLD) &&
+                 (longname != OPT_CONF_GESTURE_TIMEOUT) &&
                  conf_opts_.count(longname) )
             {
                 KeyMapEntry entry;

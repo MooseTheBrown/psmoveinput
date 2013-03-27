@@ -340,7 +340,8 @@ void PSMoveInput::startListener()
                                    config_.getPollTimeout(),
                                    config_.getConnTimeout(),
                                    config_.getDisconnectTimeout(),
-                                   config_.getLedTimeout());
+                                   config_.getLedTimeout(),
+                                   config_.getGestureTimeout());
 
     // connect listener signals to handler slots
     gyro_signal &gyroSignal = listener_->getGyroSignal();

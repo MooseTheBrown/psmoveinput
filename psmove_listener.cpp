@@ -35,7 +35,8 @@ PSMoveListener::PSMoveListener(Log &log,
                                int pollTimeout,
                                int connectTimeout,
                                int disconnectTimeout,
-                               int ledTimeout) :
+                               int ledTimeout,
+                               int gestureTimeout) :
     log_(log),
     stop_(false),
     mode_(mode),
@@ -43,7 +44,8 @@ PSMoveListener::PSMoveListener(Log &log,
     pollTimeout_(pollTimeout),
     connectTimeout_(connectTimeout),
     disconnectTimeout_(disconnectTimeout),
-    ledTimeout_(ledTimeout)
+    ledTimeout_(ledTimeout),
+    gestureTimeout_(gestureTimeout)
 {
     for (int i = 0; i < MAX_CONTROLLERS; i++)
     {
@@ -154,12 +156,12 @@ void PSMoveListener::handleNewDevice(int psmoveId, PSMove *move)
     if (controllerThreads_[0]->running() == false)
     {
         controllerThreads_[0]->start(ControllerId::FIRST, psmoveId, move, this,
-                                     pollTimeout_, disconnectTimeout_, ledTimeout_);
+                                     pollTimeout_, disconnectTimeout_, ledTimeout_, gestureTimeout_);
     }
     else if (controllerThreads_[1]->running() == false)
     {
         controllerThreads_[1]->start(ControllerId::SECOND, psmoveId, move, this,
-                                     pollTimeout_, disconnectTimeout_, ledTimeout_);
+                                     pollTimeout_, disconnectTimeout_, ledTimeout_, gestureTimeout_);
     }
 }
 
@@ -287,7 +289,8 @@ void PSMoveListener::ControllerThread::start(ControllerId id,
                                              PSMoveListener *listener,
                                              int pollTimeout,
                                              int disconnectTimeout,
-                                             int ledTimeout)
+                                             int ledTimeout,
+                                             int gestureTimeout)
 {
     // only start new thread if there isn't one already running
     if (thread_ == nullptr)
@@ -301,6 +304,7 @@ void PSMoveListener::ControllerThread::start(ControllerId id,
         pollTimeout_ = pollTimeout;
         disconnectTimeout_ = disconnectTimeout;
         ledTimeout_ = ledTimeout;
+        gestureTimeout_ = gestureTimeout;
         btaddr_ = psmove_get_serial(move_);
         if (psmove_has_calibration(move_) == PSMove_True)
         {
@@ -323,6 +327,7 @@ bool PSMoveListener::ControllerThread::running()
 void PSMoveListener::ControllerThread::operator ()()
 {
     timespec tp;
+    int gestureCount = 0;
 
     tp.tv_sec = 0;
     tp.tv_nsec = 0;
@@ -372,7 +377,12 @@ void PSMoveListener::ControllerThread::operator ()()
             else
             {
                 // second controller is used for gestures
-                listener_->getGestureSignal()(-gz, gx);
+                gestureCount++;
+                if (gestureCount > (gestureTimeout_ / pollTimeout_))
+                {
+                    gestureCount = 0;
+                    listener_->getGestureSignal()(-gz, gx);
+                }
             }
 
             buttons = psmove_get_buttons(move_);

@@ -135,6 +135,7 @@ TEST(ConfigTest, CorrectConfig)
     ASSERT_EQ(500, config.getConnTimeout());
     ASSERT_EQ(20, config.getDisconnectTimeout());
     ASSERT_EQ(1000, config.getLedTimeout());
+    ASSERT_EQ(300, config.getGestureTimeout());
 
     // check move threshold
     ASSERT_EQ(3, config.getMoveThreshold());

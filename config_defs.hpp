@@ -88,6 +88,7 @@ namespace psmoveinput
 #define OPT_GESTURE_LEFT "GESTURE_LEFT"
 #define OPT_GESTURE_RIGHT "GESTURE_RIGHT"
 #define OPT_CONF_GESTURE_THRESHOLD "GESTURE_THRESHOLD"
+#define OPT_CONF_GESTURE_TIMEOUT "GESTURE_TIMEOUT"
 
 // operation modes
 #define OPT_MODE_STANDALONE "standalone"
@@ -120,7 +121,8 @@ namespace psmoveinput
 #define DEF_DISCONNECT_TIMEOUT 7 // s
 #define DEF_LED_UPDATE_TIMEOUT 4000 // ms
 #define DEF_MOVE_THRESHOLD 0 // pixels
-#define DEF_GESTURE_THRESHOLD 50 // pixels
+#define DEF_GESTURE_THRESHOLD 100 // pixels
+#define DEF_GESTURE_TIMEOUT 600 // ms
 
 } // namespace psmoveinput
 
