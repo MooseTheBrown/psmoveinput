@@ -1,4 +1,4 @@
-psmoveinput 0.2.2
+psmoveinput 0.3.0
 
 Description
 -------------------------------------------------------------------------------
@@ -43,19 +43,24 @@ Connecting PSMove controller
 2. Run "psmovepair" as root. Notice controller's Bluetooth address. psmovepair
    is part of psmoveapi (see INSTALL for details).
 3. Disconnect the controller.
-4. Run "create_move.py <controller_BT_addr>" as root. create_move.py
-   is part of psmoveapi (see INSTALL for details).
-5. Restart bluetoothd.
-6. Press the PS button on the PSMove controller. You may see popup indicating
+4. Press the PS button on the PSMove controller. You may see popup indicating
    Bluetooth connection attempt from the controller (depends on desktop environment
     used). Authorize it and wait until the PSMove is connected.
-7. Run "psmoveinput" as root. It will automatically connect to the controller and
+5. Run "psmoveinput" as root. It will automatically connect to the controller and
    start injecting input events.
 
-Currently psmoveinput supports only one controller and does not automatically
-detect when it is disconnected. After disconnecting Bluetooth link between
-PSMove and PC it is necessary to kill psmoveinput, restart it and repeat step
-6 from the sequence above.
+This procedure is necessary only when connecting controller to the system for
+the first time. After disconnecting controller it can be reconnected by pressing
+PS button. However, if the same controller is then paired to another system
+(including Sony PlayStation itself), the procedure has to be repeated in order
+to reconnect controller to the current system.
+
+psmoveinput supports up to two simultaneously connected controllers. Controller,
+which is connected first, is used to control the mouse pointer as well as to
+report key events, while the second one is used only for keys and gestures.
+There are four gestures supported: up, down, left and right. Each of them can be
+mapped to any key supported by psmoveinput (see the default config file provided
+with psmoveinput for details).
 
 License
 -------------------------------------------------------------------------------

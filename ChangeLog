@@ -1,3 +1,16 @@
+0.3.0
+-------------------------------------------------------------------------------
+* Removed check for locally running moved preventing psmoveinput from running
+  as remote moved client.
+
+* Added move trigger support. If move trigger is used, mouse movements are
+  reported only if the trigger is acrive.
+
+* Added gesture support. Second controller can be used for gestures: up, down,
+  left, right. Gestures can be mapped to keys.
+
+* Added mouse wheel events support.
+
 0.2.2
 -------------------------------------------------------------------------------
 * Fixed regression, which broke second controller support
