@@ -109,6 +109,7 @@ protected:
     void parseConfig();
     bool configFileOK();
     void getModeFromString(const std::string &mode);
+    std::string expandTilde(const std::string &str);
 };
 
 } // namespace psmoveinput

@@ -25,6 +25,8 @@
 #include "gtest/gtest.h"
 #include <psmoveapi/psmove.h>
 #include <linux/input.h>
+#include <sys/types.h>
+#include <pwd.h>
 
 namespace psmoveconfig_test
 {
@@ -254,6 +256,27 @@ TEST(ConfigTest, DoubleSettings)
 
     config.parse(3, const_cast<char**>(argv));
     ASSERT_EQ(false, config.isOK());
+}
+
+TEST(ConfigTest, TildeExpansion)
+{
+    const char *argv[10];
+    psmoveinput::Config config;
+    struct passwd *pw;
+
+    pw = getpwuid(geteuid());
+    std::string expected_pidfile = pw->pw_dir;
+    expected_pidfile += "/testpidfile";
+
+    // program name
+    argv[0] = "test";
+    // pid file
+    argv[1] = "-p";
+    argv[2] = "~/testpidfile";
+
+    config.parse(3, const_cast<char**>(argv));
+    ASSERT_EQ(true, config.isOK());
+    ASSERT_STREQ(expected_pidfile.c_str(), config.getPidFileName());
 }
 
 } // namespace psmoveconfig_test

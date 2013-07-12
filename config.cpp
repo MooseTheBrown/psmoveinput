@@ -25,6 +25,8 @@
 #include <fstream>
 #include <iostream>
 #include <linux/input.h>
+#include <sys/types.h>
+#include <pwd.h>
 
 namespace psmoveinput
 {
@@ -161,7 +163,7 @@ void Config::handleCmdLine()
         {
             if (opts_.count(OPT_PID_ONLYLONG))
             {
-                pidfile_ = opts_[OPT_PID_ONLYLONG].as<std::string>();
+                pidfile_ = expandTilde(opts_[OPT_PID_ONLYLONG].as<std::string>());
                 pidfile_set_ = true;
             }
             if (opts_.count(OPT_LOG_ONLYLONG))
@@ -226,7 +228,7 @@ void Config::parseConfig()
         // store pidfile and log level, but don't override command line values
         if (conf_opts_.count(OPT_CONF_PID) && !pidfile_set_)
         {
-            pidfile_ = conf_opts_[OPT_CONF_PID].as<std::string>();
+            pidfile_ = expandTilde(conf_opts_[OPT_CONF_PID].as<std::string>());
             pidfile_set_ = true;
         }
         if (conf_opts_.count(OPT_CONF_LOG) && !loglevel_set_)
@@ -379,6 +381,25 @@ void Config::getModeFromString(const std::string &mode)
     {
         opmode_ = OpMode::CLIENT;
         opmode_set_ = true;
+    }
+}
+
+std::string Config::expandTilde(const std::string &str)
+{
+    if (str[0] == '~')
+    {
+        struct passwd *pwd = getpwuid(geteuid());
+        if (pwd == nullptr)
+        {
+            return str;
+        }
+        std::string result = pwd->pw_dir;
+        result += str.substr(1);
+        return result;
+    }
+    else
+    {
+        return str;
     }
 }
 
