@@ -1,4 +1,6 @@
-# 
+#!/bin/sh
+
+#
 # Copyright (C) 2012, 2013 Mikhail Sapozhnikov
 #
 # This file is part of psmoveinput.
@@ -16,10 +18,6 @@
 # You should have received a copy of the GNU General Public License
 # along with psmoveinput.  If not, see <http://www.gnu.org/licenses/>.
 #
-
-
-
-#!/bin/sh
 
 if [ -z "$1" ]; then
     exit 1
