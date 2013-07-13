@@ -41,9 +41,7 @@ Config::Config() :
     loglevel_set_(false),
     pidfile_set_(false),
     loglevel_(DEF_LOGLEVEL),
-    logfile_(DEF_LOGFILE),
     logfile_set_(false),
-    pidfile_(DEF_PIDFILE),
     config_file_(DEF_CONFIGFILE),
     config_file_set_(false),
     opmode_(OpMode::STANDALONE),
@@ -57,6 +55,12 @@ Config::Config() :
     gestureThreshold_(DEF_GESTURE_THRESHOLD),
     gestureTimeout_(DEF_GESTURE_TIMEOUT)
 {
+    // default pid file location
+    pidfile_ = expandTilde(DEF_PIDFILE);
+
+    // default log file location
+    logfile_ = expandTilde(DEF_LOGFILE);
+
     // command line options description
     optdesc_.add_options()
         (OPT_HELP, OPT_HELP_DESC)

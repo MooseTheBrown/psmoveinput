@@ -1,0 +1,3 @@
+# psmoveinput needs write access to uinput
+# the following rule makes it possible for non-root users to run psmoveinput
+KERNEL=="uinput", MODE="0666"

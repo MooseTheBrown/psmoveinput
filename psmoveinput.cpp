@@ -211,7 +211,7 @@ void PSMoveInput::processConfig(int argc, char **argv)
 void PSMoveInput::setupLog()
 {
     LogLevel loglvl = config_.getLogLevel();
-    log_ = new Log(LogParams("/var/log/psmoveinput.log", loglvl));
+    log_ = new Log(LogParams(config_.getLogFileName(), loglvl));
     FileLog *logBackend = new FileLog();
     log_->addBackend(logBackend);
     log_->write("PSMoveInput logging started");

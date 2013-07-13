@@ -114,7 +114,7 @@ namespace psmoveinput
 #define BTN_GESTURE_MASK    0x00FFFFFF
 
 // defaults
-#define DEF_PIDFILE "/var/run/psmoveinput.pid"
+#define DEF_PIDFILE "~/psmoveinput.pid"
 #define DEF_LOGLEVEL LogLevel::ERROR
 #define DEF_LOGFILE "~/psmoveinput.log"
 #define DEF_CONFIGFILE "/etc/psmoveinput.conf"

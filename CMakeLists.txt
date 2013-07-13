@@ -26,6 +26,9 @@ project (psmoveinput)
 # do we need to build unit tests?
 option (BUILD_UNIT_TESTS "generate targets to build unit tests" OFF)
 
+# install psmoveinput udev rule or not
+option (INSTALL_UDEV_RULE "install psmoveinput udev rule" OFF)
+
 set (COMMON_CXX_FLAGS "-std=c++0x")
 set (CMAKE_BUILD_TYPE RelWithDebInfo)
 set (CMAKE_LINKER_FLAGS -ldl)
@@ -64,6 +67,9 @@ set (PSMOVEINPUT_BINARY_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
 install (TARGETS psmoveinput DESTINATION bin)
 install (FILES config/psmoveinput.conf DESTINATION /etc)
 install (FILES util/psmoveinput_disconnect.py DESTINATION bin PERMISSIONS ${PSMOVEINPUT_BINARY_PERMISSIONS})
+if (INSTALL_UDEV_RULE)
+    install (FILES config/99-psmoveinput.rules DESTINATION /etc/udev/rules.d)
+endif (INSTALL_UDEV_RULE)
 
 # unit test
 if (BUILD_UNIT_TESTS)
