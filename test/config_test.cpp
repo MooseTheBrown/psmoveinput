@@ -33,7 +33,7 @@ namespace psmoveconfig_test
 
 TEST(ConfigTest, CommandLine)
 {
-    const char *argv[10];
+    const char *argv[12];
     psmoveinput::Config config;
     
     // program name
@@ -52,19 +52,23 @@ TEST(ConfigTest, CommandLine)
     argv[8] = "client";
     // foreground mode
     argv[9] = "-f";
+    // log file location
+    argv[10] = "-L";
+    argv[11] = "/var/log/testlog";
 
-    config.parse(10, const_cast<char**>(argv));
+    config.parse(12, const_cast<char**>(argv));
     ASSERT_EQ(true, config.isOK());
     ASSERT_STREQ("/var/run/testpidfile", config.getPidFileName());
     ASSERT_STREQ("/nonexistent", config.getConfigFileName());
     ASSERT_EQ(psmoveinput::LogLevel::INFO, config.getLogLevel());
+    ASSERT_STREQ("/var/log/testlog", config.getLogFileName());
     ASSERT_EQ(psmoveinput::OpMode::CLIENT, config.getOpMode());
     ASSERT_EQ(true, config.getForeground());
 
     // mess up command line a bit
     psmoveinput::Config invalid_config;
     argv[4] = "blah";
-    invalid_config.parse(10, const_cast<char**>(argv));
+    invalid_config.parse(12, const_cast<char**>(argv));
     ASSERT_EQ(false, invalid_config.isOK());
 
     // mess up command line totally
@@ -76,7 +80,7 @@ TEST(ConfigTest, CommandLine)
 
 TEST(ConfigTest, LongOptions)
 {
-    const char *argv[10];
+    const char *argv[12];
     psmoveinput::Config config;
 
     // program name
@@ -95,12 +99,16 @@ TEST(ConfigTest, LongOptions)
     argv[8] = "client";
     // foreground mode
     argv[9] = "--foreground";
+    // log file location
+    argv[10] = "--logfile";
+    argv[11] = "/var/log/testlog";
 
-    config.parse(10, const_cast<char**>(argv));
+    config.parse(12, const_cast<char**>(argv));
     ASSERT_EQ(true, config.isOK());
     ASSERT_STREQ("/var/run/testpidfile", config.getPidFileName());
     ASSERT_STREQ("/nonexistent", config.getConfigFileName());
     ASSERT_EQ(psmoveinput::LogLevel::INFO, config.getLogLevel());
+    ASSERT_STREQ("/var/log/testlog", config.getLogFileName());
     ASSERT_EQ(psmoveinput::OpMode::CLIENT, config.getOpMode());
     ASSERT_EQ(true, config.getForeground());
 }
@@ -144,6 +152,9 @@ TEST(ConfigTest, CorrectConfig)
 
     // check gesture threshold
     ASSERT_EQ(20, config.getGestureThreshold());
+
+    // check log file name
+    ASSERT_STREQ("/var/run/testlog", config.getLogFileName());
 
     // check key maps
     psmoveinput::key_map keymap1 = config.getKeyMap(psmoveinput::ControllerId::FIRST);
@@ -260,23 +271,29 @@ TEST(ConfigTest, DoubleSettings)
 
 TEST(ConfigTest, TildeExpansion)
 {
-    const char *argv[10];
+    const char *argv[5];
     psmoveinput::Config config;
     struct passwd *pw;
 
     pw = getpwuid(geteuid());
     std::string expected_pidfile = pw->pw_dir;
     expected_pidfile += "/testpidfile";
+    std::string expected_logfile = pw->pw_dir;
+    expected_logfile += "/testlogfile";
 
     // program name
     argv[0] = "test";
     // pid file
     argv[1] = "-p";
     argv[2] = "~/testpidfile";
+    // log file
+    argv[3] = "-L";
+    argv[4] = "~/testlogfile";
 
-    config.parse(3, const_cast<char**>(argv));
+    config.parse(5, const_cast<char**>(argv));
     ASSERT_EQ(true, config.isOK());
     ASSERT_STREQ(expected_pidfile.c_str(), config.getPidFileName());
+    ASSERT_STREQ(expected_logfile.c_str(), config.getLogFileName());
 }
 
 } // namespace psmoveconfig_test

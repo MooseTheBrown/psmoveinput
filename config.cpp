@@ -41,6 +41,8 @@ Config::Config() :
     loglevel_set_(false),
     pidfile_set_(false),
     loglevel_(DEF_LOGLEVEL),
+    logfile_(DEF_LOGFILE),
+    logfile_set_(false),
     pidfile_(DEF_PIDFILE),
     config_file_(DEF_CONFIGFILE),
     config_file_set_(false),
@@ -61,6 +63,7 @@ Config::Config() :
         (OPT_VERSION, OPT_VERSION_DESC)
         (OPT_PID, po::value<std::string>(), OPT_PID_DESC)
         (OPT_LOG, po::value<char>(), OPT_LOG_DESC)
+        (OPT_LOG_FILE, po::value<std::string>(), OPT_LOG_FILE_DESC)
         (OPT_CONFIG, po::value<std::string>(), OPT_CONFIG_DESC)
         (OPT_MODE, po::value<std::string>(), OPT_MODE_DESC)
         (OPT_FOREGROUND, OPT_FOREGROUND_DESC);
@@ -69,6 +72,7 @@ Config::Config() :
     configdesc_.add_options()
         (OPT_CONF_PID, po::value<std::string>())
         (OPT_CONF_LOG, po::value<char>())
+        (OPT_CONF_LOG_FILE, po::value<std::string>())
         (OPT_MOVEC_X, po::value<double>())
         (OPT_MOVEC_Y, po::value<double>())
         (OPT_PSBTN_TRIANGLE, po::value<std::string>())
@@ -170,6 +174,11 @@ void Config::handleCmdLine()
             {
                 getLogFromChar(opts_[OPT_LOG_ONLYLONG].as<char>());
             }
+            if (opts_.count(OPT_LOG_FILE_ONLYLONG))
+            {
+                logfile_ = expandTilde(opts_[OPT_LOG_FILE_ONLYLONG].as<std::string>());
+                logfile_set_ = true;
+            }
             if (opts_.count(OPT_CONFIG_ONLYLONG))
             {
                 config_file_ = opts_[OPT_CONFIG_ONLYLONG].as<std::string>();
@@ -225,7 +234,7 @@ void Config::parseConfig()
         po::store(po::parse_config_file<char>(config_file_.c_str(), configdesc_), conf_opts_);
         po::notify(conf_opts_);
 
-        // store pidfile and log level, but don't override command line values
+        // store pidfile, logfile and log level, but don't override command line values
         if (conf_opts_.count(OPT_CONF_PID) && !pidfile_set_)
         {
             pidfile_ = expandTilde(conf_opts_[OPT_CONF_PID].as<std::string>());
@@ -234,6 +243,11 @@ void Config::parseConfig()
         if (conf_opts_.count(OPT_CONF_LOG) && !loglevel_set_)
         {
             getLogFromChar(conf_opts_[OPT_CONF_LOG].as<char>());
+        }
+        if (conf_opts_.count(OPT_CONF_LOG_FILE) && !logfile_set_)
+        {
+            logfile_ = expandTilde(conf_opts_[OPT_CONF_LOG_FILE].as<std::string>());
+            logfile_set_ = true;
         }
         // store move coefficients
         if (conf_opts_.count(OPT_MOVEC_X))
@@ -288,6 +302,7 @@ void Config::parseConfig()
             // filter out non-key options
             if ( (longname != OPT_CONF_PID) &&
                  (longname != OPT_CONF_LOG) &&
+                 (longname != OPT_CONF_LOG_FILE) &&
                  (longname != OPT_MOVEC_X) &&
                  (longname != OPT_MOVEC_Y) &&
                  (longname != OPT_CONF_MODE) &&

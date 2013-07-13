@@ -51,6 +51,8 @@ public:
     key_map getKeyMap(ControllerId controller);
     // get log level
     LogLevel getLogLevel() { return loglevel_; }
+    // get location of the log file
+    const char *getLogFileName() { return logfile_.c_str(); }
     // get operation mode
     OpMode getOpMode() { return opmode_; }
     // get fork mode
@@ -86,6 +88,8 @@ protected:
     bool ok_;
     bool loglevel_set_;
     LogLevel loglevel_;
+    std::string logfile_;
+    bool logfile_set_;
     bool pidfile_set_;
     std::string pidfile_;
     MoveCoeffs coeffs_;

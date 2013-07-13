@@ -35,6 +35,9 @@ namespace psmoveinput
 #define OPT_LOG "loglevel,l"
 #define OPT_LOG_DESC "log level"
 #define OPT_LOG_ONLYLONG "loglevel"
+#define OPT_LOG_FILE "logfile,L"
+#define OPT_LOG_FILE_DESC "location of log file"
+#define OPT_LOG_FILE_ONLYLONG "logfile"
 #define OPT_CONFIG "config,c"
 #define OPT_CONFIG_DESC "config file location"
 #define OPT_CONFIG_ONLYLONG "config"
@@ -53,6 +56,7 @@ namespace psmoveinput
 // config file options
 #define OPT_CONF_PID "PID_FILE"
 #define OPT_CONF_LOG "LOG_LEVEL"
+#define OPT_CONF_LOG_FILE "LOG_FILE"
 #define OPT_MOVEC_X "MOVE_COEFF_X"
 #define OPT_MOVEC_Y "MOVE_COEFF_Y"
 #define OPT_PSBTN_L2 "PSBTN_L2"
@@ -112,6 +116,7 @@ namespace psmoveinput
 // defaults
 #define DEF_PIDFILE "/var/run/psmoveinput.pid"
 #define DEF_LOGLEVEL LogLevel::ERROR
+#define DEF_LOGFILE "~/psmoveinput.log"
 #define DEF_CONFIGFILE "/etc/psmoveinput.conf"
 #define DEF_MOVEC_X 1.0
 #define DEF_MOVEC_Y 1.0
