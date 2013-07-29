@@ -1,7 +1,5 @@
-psmoveinput 0.3.0
-
 Description
--------------------------------------------------------------------------------
+-----------
 psmoveinput is a userspace Linux input driver that uses data from PSMove motion
 controller to inject events to kernel's input subsystem thus making it possible
 to use PSMove as a combined mouse/keyboard input device. It gives users ability
@@ -9,10 +7,10 @@ to control mouse pointer movements by moving PSMove controller and map PSMove
 keys to common keyboard keys.
 
 Dependencies
--------------------------------------------------------------------------------
+------------
 psmoveinput requires the following software to be installed:
 
-- psmoveapi (http://thp.io/2010/psmove/)
+- [psmoveapi](http://thp.io/2010/psmove/)
 - uinput module (modprobe uinput as root)
 - bluez
 - boost-thread
@@ -23,11 +21,11 @@ bluez and boost libraries should be present in most distributions' repos.
 psmoveapi should be compiled and installed from source.
 
 Installation
--------------------------------------------------------------------------------
+------------
 See INSTALL for instructions on how to build and install psmoveinput.
 
 Configuring and running
--------------------------------------------------------------------------------
+-----------------------
 psmoveinput needs to be run by root user in order to interact with uinput module.
 psmoveinput recognizes several command-line options and reads its configuration
 from a file. The location of configuration file is specified with -c or --config
@@ -38,7 +36,7 @@ To get the list of all recognized command line options run psmoveinput with
 -h or --help argument.
 
 Connecting PSMove controller
--------------------------------------------------------------------------------
+----------------------------
 1. Connect PSMove to PC via USB.
 2. Run "psmovepair" as root. Notice controller's Bluetooth address. psmovepair
    is part of psmoveapi (see INSTALL for details).
@@ -63,11 +61,11 @@ mapped to any key supported by psmoveinput (see the default config file provided
 with psmoveinput for details).
 
 License
--------------------------------------------------------------------------------
+-------
 GNU GPLv3 or any later version (see COPYING).
 Google Test Framework provided with psmoveinput is covered by its own license,
 see gtest-1.6.0/COPYING for details.
 
 Credits
--------------------------------------------------------------------------------
+-------
 Thanks to Thomas Perl and all who contributed to psmoveapi library.
