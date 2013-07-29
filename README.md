@@ -22,7 +22,7 @@ psmoveapi should be compiled and installed from source.
 
 Installation
 ------------
-See [INSTALL](./INSTALL) for instructions on how to build and install psmoveinput.
+See [INSTALL.md](./INSTALL.md) for instructions on how to build and install psmoveinput.
 
 Configuring and running
 -----------------------
@@ -39,7 +39,7 @@ Connecting PSMove controller
 ----------------------------
 1. Connect PSMove to PC via USB.
 2. Run "psmovepair" as root. Notice controller's Bluetooth address. psmovepair
-   is part of psmoveapi (see [INSTALL](./INSTALL) for details).
+   is part of psmoveapi (see [INSTALL.md](./INSTALL.md) for details).
 3. Disconnect the controller.
 4. Press the PS button on the PSMove controller. You may see popup indicating
    Bluetooth connection attempt from the controller (depends on desktop environment

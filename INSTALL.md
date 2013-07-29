@@ -1,13 +1,10 @@
 Pre-requisites
--------------------------------------------------------------------------------
+--------------
 1. psmoveapi. See http://thp.io/2010/psmove/ for instructions on how to get the
    source, build and install it.
-   psmoveapi provides a couple of useful executable files that are required to
-   connect PSMove controller to PC via Bluetooth. psmovepair is installed into
-   <install_prefix>/bin directory, and should be present in PATH after psmoveapi
-   is installed. create_move.py is located in <psmoveapi_src_dir>/contrib/
-   directory. You may want to copy it manually to the same location where psmovepair
-   is installed to be able to run it later by just typing "create_move.py".
+   psmoveapi provides psmovepair utility, which is required to connect PSMove controller
+   to PC via Bluetooth. psmovepair is installed into <install_prefix>/bin directory,
+   and should be present in PATH after psmoveapi is installed.
 
 2. Boost libraries. At least boost-thread and boost-program-options have to be installed.
    You will also need boost development headers (usually tha package is called boost-devel).
@@ -22,11 +19,11 @@ Pre-requisites
 6. git
 
 Getting the sources
--------------------------------------------------------------------------------
+-------------------
 git clone https://github.com/MooseTheBrown/psmoveinput.git
 
 Building the source
--------------------------------------------------------------------------------
+-------------------
 Use the following sequence of commands to build psmoveinput:
 
 1. cd psmoveinput
@@ -54,6 +51,6 @@ make target for building the runner run "cmake -D BUILD_UNIT_TESTS=ON". Then
 run "make psmoveinput-test". This will produce file "psmoveinput-test". Launch it
 to run the tests.
 psmoveinput utilizes Google Test Framework for unit tests. For information regarding
-how to write the tests and add them to the psmoveinput test suite, refer to Google
-Test documentation at http://code.google.com/p/googletest/wiki/Documentation
+how to write the tests and add them to the psmoveinput test suite, refer to [Google
+Test documentation](http://code.google.com/p/googletest/wiki/Documentation)
 
