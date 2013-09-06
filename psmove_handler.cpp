@@ -22,6 +22,7 @@
 
 #include "psmove_handler.hpp"
 #include <boost/format.hpp>
+#include <boost/thread/locks.hpp>
 
 namespace psmoveinput
 {
