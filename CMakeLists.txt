@@ -37,6 +37,7 @@ set (CMAKE_CXX_FLAGS_RELEASE ${COMMON_CXX_FLAGS})
 set (COMMON_LINK_LIBS psmoveapi
                       boost_thread-mt
                       boost_program_options-mt
+                      boost_system
                       rt)
 
 include_directories (${psmoveinput_SOURCE_DIR})
