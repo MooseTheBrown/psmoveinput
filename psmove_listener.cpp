@@ -394,9 +394,9 @@ void PSMoveListener::ControllerThread::operator ()()
 
             // remember when we received last piece of data from PSMove
             clock_gettime(CLOCK_MONOTONIC_RAW, &lastTp_);
-
-            updateLeds();
         }
+
+        updateLeds();
 
         // if controller does not give data updates for a specific period
         // of time, consider it disconnected and stop the thread
@@ -451,11 +451,13 @@ void PSMoveListener::ControllerThread::setLeds()
 
 void PSMoveListener::ControllerThread::updateLeds()
 {
+    log_.write(boost::str(boost::format("updateLeds(), pollCount_=%1%") %pollCount_).c_str());
     pollCount_++;
     if (pollCount_ > (ledTimeout_ / pollTimeout_))
     {
         pollCount_ = 0;
-        psmove_update_leds(move_);
+        int update_result = psmove_update_leds(move_);
+        log_.write(boost::str(boost::format("psmove_update_leds() returned %1%") %update_result).c_str());
     }
 }
 
