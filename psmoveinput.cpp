@@ -129,6 +129,7 @@ int PSMoveInput::run(int argc, char **argv)
             log_->write(e.what(), LogLevel::FATAL);
         }
         retval = RETVAL_FAIL;
+        removePidFile();
     }
 
     return retval;
