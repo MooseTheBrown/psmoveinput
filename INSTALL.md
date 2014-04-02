@@ -14,7 +14,7 @@ Pre-requisites
 
 4. cmake, make
 
-5. gcc 4.6.x or 4.7.x
+5. gcc 4.6.x or later
 
 6. git
 

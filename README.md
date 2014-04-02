@@ -26,7 +26,6 @@ See [INSTALL.md](./INSTALL.md) for instructions on how to build and install psmo
 
 Configuring and running
 -----------------------
-psmoveinput needs to be run by root user in order to interact with uinput module.
 psmoveinput recognizes several command-line options and reads its configuration
 from a file. The location of configuration file is specified with -c or --config
 command line options. During psmoveinput installation default configuration
@@ -38,13 +37,13 @@ To get the list of all recognized command line options run psmoveinput with
 Connecting PSMove controller
 ----------------------------
 1. Connect PSMove to PC via USB.
-2. Run "psmovepair" as root. Notice controller's Bluetooth address. psmovepair
-   is part of psmoveapi (see [INSTALL.md](./INSTALL.md) for details).
+2. Run "psmovepair" as root. psmovepair is part of psmoveapi
+   (see [INSTALL.md](./INSTALL.md) for details).
 3. Disconnect the controller.
 4. Press the PS button on the PSMove controller. You may see popup indicating
    Bluetooth connection attempt from the controller (depends on desktop environment
     used). Authorize it and wait until the PSMove is connected.
-5. Run "psmoveinput" as root. It will automatically connect to the controller and
+5. Run "psmoveinput". It will automatically connect to the controller and
    start injecting input events.
 
 This procedure is necessary only when connecting controller to the system for
