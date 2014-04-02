@@ -1,7 +1,7 @@
 #!/bin/sh
 
 #
-# Copyright (C) 2012, 2013 Mikhail Sapozhnikov
+# Copyright (C) 2012, 2013, 2014 Mikhail Sapozhnikov
 #
 # This file is part of psmoveinput.
 #
