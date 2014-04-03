@@ -29,6 +29,9 @@ option (BUILD_UNIT_TESTS "generate targets to build unit tests" OFF)
 # install psmoveinput udev rule or not
 option (INSTALL_UDEV_RULE "install psmoveinput udev rule" OFF)
 
+# support Bluez 5.x
+option (BLUEZ5_SUPPORT "Bluez 5.x support" OFF)
+
 set (COMMON_CXX_FLAGS "-std=c++0x")
 set (CMAKE_BUILD_TYPE RelWithDebInfo)
 set (CMAKE_LINKER_FLAGS -ldl)
@@ -67,7 +70,15 @@ set (PSMOVEINPUT_BINARY_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
                                     WORLD_READ WORLD_EXECUTE)
 install (TARGETS psmoveinput DESTINATION bin)
 install (FILES config/psmoveinput.conf DESTINATION /etc)
+
+# psmoveinput_disconnect Python script installation
+if (BLUEZ5_SUPPORT)
+install (FILES util/psmoveinput_bluez5_disconnect.py DESTINATION bin PERMISSIONS ${PSMOVEINPUT_BINARY_PERMISSIONS} RENAME psmoveinput_disconnect.py)
+else (BLUEZ5_SUPPORT)
 install (FILES util/psmoveinput_disconnect.py DESTINATION bin PERMISSIONS ${PSMOVEINPUT_BINARY_PERMISSIONS})
+endif (BLUEZ5_SUPPORT)
+
+# udev rule installation
 if (INSTALL_UDEV_RULE)
     install (FILES config/99-psmoveinput.rules DESTINATION /etc/udev/rules.d)
 endif (INSTALL_UDEV_RULE)
