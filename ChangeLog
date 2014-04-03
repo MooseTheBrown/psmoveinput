@@ -6,6 +6,8 @@
 
 * Added tilde expansion to pid file location configuration
 
+* Added Bluez 5.x support
+
 * Various minor fixes
 
 0.3.0
