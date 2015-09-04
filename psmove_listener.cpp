@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2012, 2013, 2014 Mikhail Sapozhnikov
+ * Copyright (C) 2012, 2013, 2014, 2015 Mikhail Sapozhnikov
  *
  * This file is part of psmoveinput.
  *
@@ -228,6 +228,7 @@ PSMove *PSMoveListener::connect(int &psmoveId)
                 // ignore controllers connected via USB
                 psmove_disconnect(move);
                 move = nullptr;
+                continue;
             }
             break;
         }
