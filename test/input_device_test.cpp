@@ -1,5 +1,5 @@
-/* 
- * Copyright (C) 2012, 2013, 2014 Mikhail Sapozhnikov
+/*
+ * Copyright (C) 2012 - 2015 Mikhail Sapozhnikov
  *
  * This file is part of psmoveinput.
  *
@@ -131,6 +131,12 @@ void DeviceListener::operator() ()
     fd_ = open(devfile_.c_str(), O_RDONLY | O_NONBLOCK);
     if (fd_ < 0)
     {
+        return;
+    }
+
+    if (ioctl(fd_, EVIOCGRAB, (void*)1))
+    {
+        close(fd_);
         return;
     }
 

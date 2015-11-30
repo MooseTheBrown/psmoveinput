@@ -1,5 +1,5 @@
-/* 
- * Copyright (C) 2012, 2013, 2014 Mikhail Sapozhnikov
+/*
+ * Copyright (C) 2012 - 2015 Mikhail Sapozhnikov
  *
  * This file is part of psmoveinput.
  *
@@ -401,7 +401,7 @@ void PSMoveInput::print_version()
     std::cout << "psmoveinput version " << PSMOVEINPUT_VERSION << "\n";
     std::cout << "psmoveinput is a Linux input driver turning PSMove controller\n\
 into mouse/keyboard input device\n\n";
-    std::cout << "Copyright (C) 2012, 2013, 2014  Mikhail Sapozhnikov (masapozhnikov@yandex.ru)\n";
+    std::cout << "Copyright (C) 2012 - 2015  Mikhail Sapozhnikov (masapozhnikov@yandex.ru)\n";
     std::cout << "This program is free software: you can redistribute it and/or modify\n\
 it under the terms of the GNU General Public License as published by\n\
 the Free Software Foundation, either version 3 of the License, or\n\
