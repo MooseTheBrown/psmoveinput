@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 - 2015 Mikhail Sapozhnikov
+# Copyright (C) 2012 - 2018 Mikhail Sapozhnikov
 #
 # This file is part of psmoveinput.
 #
@@ -30,7 +30,7 @@ option (BUILD_UNIT_TESTS "generate targets to build unit tests" OFF)
 option (INSTALL_UDEV_RULE "install psmoveinput udev rule" OFF)
 
 # support Bluez 5.x
-option (BLUEZ5_SUPPORT "Bluez 5.x support" OFF)
+option (BLUEZ5_SUPPORT "Bluez 5.x support" ON)
 
 set (COMMON_CXX_FLAGS "-std=c++0x")
 set (CMAKE_BUILD_TYPE RelWithDebInfo)
@@ -38,8 +38,8 @@ set (CMAKE_LINKER_FLAGS -ldl)
 set (CMAKE_CXX_FLAGS_RELWITHDEBINFO "${COMMON_CXX_FLAGS} -ggdb")
 set (CMAKE_CXX_FLAGS_RELEASE ${COMMON_CXX_FLAGS})
 set (COMMON_LINK_LIBS psmoveapi
-                      boost_thread-mt
-                      boost_program_options-mt
+                      boost_thread
+                      boost_program_options
                       boost_system
                       rt)
 
@@ -47,7 +47,7 @@ include_directories (${psmoveinput_SOURCE_DIR})
 
 set (PSMOVEINPUT_VERSION_MAJOR "0")
 set (PSMOVEINPUT_VERSION_MINOR "4")
-set (PSMOVEINPUT_VERSION_PATCH "1")
+set (PSMOVEINPUT_VERSION_PATCH "2")
 configure_file (${psmoveinput_SOURCE_DIR}/config.h.in
                 ${psmoveinput_SOURCE_DIR}/config.h)
 
