@@ -35,6 +35,8 @@ TEST(ConfigTest, CommandLine)
 {
     const char *argv[12];
     psmoveinput::Config config;
+    std::string config_name = TEST_CONFIG_PATH;
+    config_name += "test_config.conf";
     
     // program name
     argv[0] = "test";
@@ -46,7 +48,7 @@ TEST(ConfigTest, CommandLine)
     argv[4] = "2";
     // config file
     argv[5] = "-c";
-    argv[6] = "/nonexistent";
+    argv[6] = config_name.c_str();
     // operation mode
     argv[7] = "-m";
     argv[8] = "client";
@@ -59,7 +61,7 @@ TEST(ConfigTest, CommandLine)
     config.parse(12, const_cast<char**>(argv));
     ASSERT_EQ(true, config.isOK());
     ASSERT_STREQ("/var/run/testpidfile", config.getPidFileName());
-    ASSERT_STREQ("/nonexistent", config.getConfigFileName());
+    ASSERT_STREQ(config_name.c_str(), config.getConfigFileName());
     ASSERT_EQ(psmoveinput::LogLevel::INFO, config.getLogLevel());
     ASSERT_STREQ("/var/log/testlog", config.getLogFileName());
     ASSERT_EQ(psmoveinput::OpMode::CLIENT, config.getOpMode());
@@ -82,6 +84,8 @@ TEST(ConfigTest, LongOptions)
 {
     const char *argv[12];
     psmoveinput::Config config;
+    std::string config_name = TEST_CONFIG_PATH;
+    config_name += "test_config.conf";
 
     // program name
     argv[0] = "test";
@@ -93,7 +97,7 @@ TEST(ConfigTest, LongOptions)
     argv[4] = "2";
     // config file
     argv[5] = "--config";
-    argv[6] = "/nonexistent";
+    argv[6] = config_name.c_str();
     // operation mode
     argv[7] = "--mode";
     argv[8] = "client";
@@ -106,7 +110,7 @@ TEST(ConfigTest, LongOptions)
     config.parse(12, const_cast<char**>(argv));
     ASSERT_EQ(true, config.isOK());
     ASSERT_STREQ("/var/run/testpidfile", config.getPidFileName());
-    ASSERT_STREQ("/nonexistent", config.getConfigFileName());
+    ASSERT_STREQ(config_name.c_str(), config.getConfigFileName());
     ASSERT_EQ(psmoveinput::LogLevel::INFO, config.getLogLevel());
     ASSERT_STREQ("/var/log/testlog", config.getLogFileName());
     ASSERT_EQ(psmoveinput::OpMode::CLIENT, config.getOpMode());
