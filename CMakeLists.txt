@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 - 2018 Mikhail Sapozhnikov
+# Copyright (C) 2012 - 2020 Mikhail Sapozhnikov
 #
 # This file is part of psmoveinput.
 #
@@ -47,7 +47,7 @@ include_directories (${psmoveinput_SOURCE_DIR})
 
 set (PSMOVEINPUT_VERSION_MAJOR "0")
 set (PSMOVEINPUT_VERSION_MINOR "4")
-set (PSMOVEINPUT_VERSION_PATCH "2")
+set (PSMOVEINPUT_VERSION_PATCH "3")
 configure_file (${psmoveinput_SOURCE_DIR}/config.h.in
                 ${psmoveinput_SOURCE_DIR}/config.h)
 
@@ -70,6 +70,7 @@ set (PSMOVEINPUT_BINARY_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
                                     WORLD_READ WORLD_EXECUTE)
 install (TARGETS psmoveinput DESTINATION bin)
 install (FILES config/psmoveinput.conf DESTINATION /etc)
+install (FILES config/psmoveinput.service DESTINATION /etc/systemd/system)
 
 # psmoveinput_disconnect Python script installation
 if (BLUEZ5_SUPPORT)

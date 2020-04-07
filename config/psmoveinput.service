@@ -1,0 +1,14 @@
+[Unit]
+Description=psmoveinput service
+Wants=bluetooth.service
+After=bluetooth.service
+
+[Service]
+Type=simple
+PIDFile=/var/run/psmoveinput.pid
+ExecStart=/usr/bin/psmoveinput -p /var/run/psmoveinput.pid -c /etc/psmoveinput.conf -L /var/log/psmoveinput.log -f
+ExecStop=/usr/bin/killall psmoveinput
+StandardError=null
+
+[Install]
+WantedBy=multi-user.target
