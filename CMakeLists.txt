@@ -32,7 +32,7 @@ option (INSTALL_UDEV_RULE "install psmoveinput udev rule" OFF)
 # support Bluez 5.x
 option (BLUEZ5_SUPPORT "Bluez 5.x support" ON)
 
-set (COMMON_CXX_FLAGS "-std=c++0x")
+set (COMMON_CXX_FLAGS "-std=c++0x -pthread")
 set (CMAKE_BUILD_TYPE RelWithDebInfo)
 set (CMAKE_LINKER_FLAGS -ldl)
 set (CMAKE_CXX_FLAGS_RELWITHDEBINFO "${COMMON_CXX_FLAGS} -ggdb")
