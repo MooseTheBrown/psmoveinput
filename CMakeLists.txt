@@ -47,7 +47,7 @@ include_directories (${psmoveinput_SOURCE_DIR})
 
 set (PSMOVEINPUT_VERSION_MAJOR "0")
 set (PSMOVEINPUT_VERSION_MINOR "4")
-set (PSMOVEINPUT_VERSION_PATCH "3")
+set (PSMOVEINPUT_VERSION_PATCH "4")
 configure_file (${psmoveinput_SOURCE_DIR}/config.h.in
                 ${psmoveinput_SOURCE_DIR}/config.h)
 
