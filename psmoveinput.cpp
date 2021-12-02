@@ -26,11 +26,14 @@
 #include <iostream>
 #include <unistd.h>
 #include <boost/format.hpp>
+#include <boost/bind/placeholders.hpp>
 #include <signal.h>
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <exception>
+
+using namespace boost::placeholders;
 
 namespace psmoveinput
 {
