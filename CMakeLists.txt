@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 - 2020 Mikhail Sapozhnikov
+# Copyright (C) 2012 - 2021 Mikhail Sapozhnikov
 #
 # This file is part of psmoveinput.
 #
@@ -47,7 +47,7 @@ include_directories (${psmoveinput_SOURCE_DIR})
 
 set (PSMOVEINPUT_VERSION_MAJOR "0")
 set (PSMOVEINPUT_VERSION_MINOR "4")
-set (PSMOVEINPUT_VERSION_PATCH "4")
+set (PSMOVEINPUT_VERSION_PATCH "5")
 configure_file (${psmoveinput_SOURCE_DIR}/config.h.in
                 ${psmoveinput_SOURCE_DIR}/config.h)
 
