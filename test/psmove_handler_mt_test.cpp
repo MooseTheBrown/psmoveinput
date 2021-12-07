@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2012, 2013, 2014 Mikhail Sapozhnikov
+ * Copyright (C) 2012 - 2021 Mikhail Sapozhnikov
  *
  * This file is part of psmoveinput.
  *
@@ -21,7 +21,10 @@
 #include "psmove_handler.hpp"
 #include "gtest/gtest.h"
 #include <boost/thread/thread.hpp>
+#include <boost/bind/placeholders.hpp>
 #include <vector>
+
+using namespace boost::placeholders;
 
 namespace psmovehandler_mt_test
 {
