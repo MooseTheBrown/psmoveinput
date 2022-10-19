@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2012, 2013, 2014 Mikhail Sapozhnikov
+ * Copyright (C) 2012 - 2022 Mikhail Sapozhnikov
  *
  * This file is part of psmoveinput.
  *
@@ -56,7 +56,7 @@ InputDevice::InputDevice(const char *devname, key_array &keys, Log &log) :
 
     uinput_user_dev uidev;
     std::memset(&uidev, 0, sizeof (uidev));
-    std::snprintf(uidev.name, UINPUT_MAX_NAME_SIZE, devname);
+    std::snprintf(uidev.name, UINPUT_MAX_NAME_SIZE, "%s", devname);
     uidev.id.bustype = BUS_BLUETOOTH;
     uidev.id.vendor = PSMOVE_VENDOR_ID;
     uidev.id.product = PSMOVE_PRODUCT_ID;
