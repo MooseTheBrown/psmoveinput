@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2012, 2013, 2014, 2015 Mikhail Sapozhnikov
+ * Copyright (C) 2012 - 2023 Mikhail Sapozhnikov
  *
  * This file is part of psmoveinput.
  *
@@ -307,7 +307,7 @@ void PSMoveListener::ControllerThread::start(ControllerId id,
         ledTimeout_ = ledTimeout;
         gestureTimeout_ = gestureTimeout;
         btaddr_ = psmove_get_serial(move_);
-        if (psmove_has_calibration(move_) == PSMove_True)
+        if (psmove_has_calibration(move_) == true)
         {
             calibrated_ = true;
         }
